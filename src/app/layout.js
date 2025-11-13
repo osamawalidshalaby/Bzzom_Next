@@ -1,5 +1,6 @@
 "use client";
 import { useState, createContext, useContext } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import Navigation from "../app/_components/Navigation";
 import "./globals.css";
@@ -18,6 +19,17 @@ export const useApp = () => {
 };
 
 export default function RootLayout({ children }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1 دقيقة
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  );
   const [cart, setCart] = useState([]);
   const [reviews, setReviews] = useState([
     {
@@ -87,19 +99,24 @@ export default function RootLayout({ children }) {
     <html lang="ar" dir="rtl">
       <head>
         <title>مطعم بزوم - الطعم الأصيل</title>
-        <meta name="description" content="مطعم بزوم - نقدم أشهى الأطباق العربية الأصيلة بأعلى مستويات الجودة والنكهة" />
+        <meta
+          name="description"
+          content="مطعم بزوم - نقدم أشهى الأطباق العربية الأصيلة بأعلى مستويات الجودة والنكهة"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
       <body>
-        <AppContext.Provider value={value}>
-          <div className="font-['Tajawal'] bg-black min-h-screen">
-            <Navigation />
-            <AnimatePresence mode="wait">{children}</AnimatePresence>
-          </div>
-        </AppContext.Provider>
+        <QueryClientProvider client={queryClient}>
+          <AppContext.Provider value={value}>
+            <div className="font-['Tajawal'] bg-black min-h-screen">
+              <Navigation />
+              <AnimatePresence mode="wait">{children}</AnimatePresence>
+            </div>
+          </AppContext.Provider>
+        </QueryClientProvider>
       </body>
     </html>
   );
