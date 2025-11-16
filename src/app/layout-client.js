@@ -96,6 +96,11 @@ export default function ClientLayout({ children }) {
 
   return (
     <html lang="ar" dir="rtl">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="theme-color" content="#e63946" />
+      </head>
       <body>
         <QueryClientProvider client={queryClient}>
           <AppContext.Provider value={value}>
@@ -106,6 +111,15 @@ export default function ClientLayout({ children }) {
           </AppContext.Provider>
         </QueryClientProvider>
       </body>
+      {typeof window !== "undefined" && (
+        <script>
+          {`
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/sw.js");
+      }
+    `}
+        </script>
+      )}
     </html>
   );
 }
