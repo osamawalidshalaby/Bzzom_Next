@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
-import { useApp } from '../layout';
+import { useApp } from '../layout-client';
 import Image from 'next/image';
 
 const ItemModal = ({ 

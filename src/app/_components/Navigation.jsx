@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu as MenuIcon, X, Users, MessageSquare, ChefHat, Home as HomeIcon, Utensils, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useApp } from '../layout';
+import { useApp } from '../layout-client';
 import Image from 'next/image';
 
 const Navigation = () => {

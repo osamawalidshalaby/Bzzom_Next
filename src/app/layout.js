@@ -1,126 +1,32 @@
-"use client";
-import { useState, createContext, useContext } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AnimatePresence } from "framer-motion";
-import Navigation from "../app/_components/Navigation";
-import "./globals.css";
+// app/layout.js
+import ClientLayout from "./layout-client";
 
 
-
-// إنشاء Context
-const AppContext = createContext();
-
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error("useApp must be used within an AppProvider");
-  }
-  return context;
+export const metadata = {
+  title: "مطعم بزوم - Bazzom | أشهى الأطباق العربية الأصلية",
+  description:
+    "مطعم بزوم Bazzom في دمياط يقدم أشهى الأطباق العربية الأصيلة، جودة عالية، نكهات مميزة، وخدمة ممتازة. اكتشف قائمة الطعام والعروض اليومية.",
+  keywords:
+    "مطعم بزوم, Bazzom, مطعم عربي, أكل عربي, مطاعم دمياط, طعام شرقي, أطباق عربية, أفضل مطعم, مطعم جودة عالية",
+  authors: [{ name: "مطعم بزوم - Bazzom Restaurant" }],
+  openGraph: {
+    title: "مطعم بزوم - Bazzom | الطعم الأصيل",
+    description:
+      "استمتع بأفضل الأطباق العربية الأصيلة في مطعم بزوم Bazzom، نكهات لا تُنسى وخدمة ممتازة في دمياط.",
+    url: "https://www.bazzom.shop/",
+    siteName: "Bazzom Restaurant",
+    type: "website",
+    locale: "ar_EG",
+  },
+  alternates: {
+    canonical: "https://www.bazzom.shop/",
+    languages: {
+      "ar-EG": "https://www.bazzom.shop/",
+    },
+  },
 };
 
+
 export default function RootLayout({ children }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60 * 1000, // 1 دقيقة
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  );
-  const [cart, setCart] = useState([]);
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: "عمر الشمري",
-      rating: 5,
-      message: "تجربة رائعة وطعام لذيذ جداً",
-    },
-    {
-      id: 2,
-      name: "Sara Ahmed",
-      rating: 5,
-      message: "Best Arabic restaurant in town!",
-    },
-  ]);
-
-  const addToCart = (item) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      } else {
-        return [...prevCart, { ...item, quantity: 1 }];
-      }
-    });
-  };
-
-  const removeFromCart = (itemId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== itemId));
-  };
-
-  const updateQuantity = (itemId, newQuantity) => {
-    if (newQuantity === 0) {
-      removeFromCart(itemId);
-    } else {
-      setCart((prevCart) =>
-        prevCart.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        )
-      );
-    }
-  };
-
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => {
-      const price = parseInt(item.price.replace(/[^0-9]/g, ""));
-      return total + price * item.quantity;
-    }, 0);
-  };
-
-  const value = {
-    cart,
-    reviews,
-    setReviews,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    getTotalPrice,
-    setCart,
-  };
-
-  return (
-    <html lang="ar" dir="rtl">
-      <head>
-        <title>مطعم بزوم - الطعم الأصيل</title>
-        <meta
-          name="description"
-          content="مطعم بزوم - نقدم أشهى الأطباق العربية الأصيلة بأعلى مستويات الجودة والنكهة"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
-        <QueryClientProvider client={queryClient}>
-          <AppContext.Provider value={value}>
-            <div className="font-['Tajawal'] bg-black min-h-screen">
-              <Navigation />
-              <AnimatePresence mode="wait">{children}</AnimatePresence>
-            </div>
-          </AppContext.Provider>
-        </QueryClientProvider>
-      </body>
-    </html>
-  );
+  return <ClientLayout>{children}</ClientLayout>;
 }
-
-
-

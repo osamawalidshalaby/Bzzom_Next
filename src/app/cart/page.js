@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-import { useApp } from "../layout";
+import { useApp } from "../layout-client";
 import Image from "next/image";
 
 const Cart = () => {

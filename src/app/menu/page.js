@@ -6,7 +6,7 @@ import MenuCard from "../_components/MenuCard";
 import ItemModal from "../_components/ItemModal";
 import { useCartSound } from "../_hooks/useCartSound";
 import toast, { Toaster } from "react-hot-toast";
-import { useApp } from "../layout";
+import { useApp } from "../layout-client";
 
 const Menu = () => {
   const { addToCart } = useApp();
