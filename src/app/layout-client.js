@@ -1,10 +1,18 @@
+
 // app/layout-client.js (Client Component)
 "use client";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import Navigation from "../app/_components/Navigation";
+import { Tajawal } from "next/font/google";
 import "./globals.css";
+
+const tajawal = Tajawal({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["200", "300", "400", "500", "700", "800"],
+});
 
 // إنشاء Context
 const AppContext = createContext();
@@ -44,6 +52,8 @@ export default function ClientLayout({ children }) {
       message: "Best Arabic restaurant in town!",
     },
   ]);
+
+
 
   const addToCart = (item) => {
     setCart((prevCart) => {
@@ -96,12 +106,7 @@ export default function ClientLayout({ children }) {
 
   return (
     <html lang="ar" dir="rtl">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <meta name="theme-color" content="#e63946" />
-      </head>
-      <body>
+      <body className={tajawal.className}>
         <QueryClientProvider client={queryClient}>
           <AppContext.Provider value={value}>
             <div className="font-['Tajawal'] bg-black min-h-screen">
@@ -111,15 +116,6 @@ export default function ClientLayout({ children }) {
           </AppContext.Provider>
         </QueryClientProvider>
       </body>
-      {typeof window !== "undefined" && (
-        <script>
-          {`
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/sw.js");
-      }
-    `}
-        </script>
-      )}
     </html>
   );
 }

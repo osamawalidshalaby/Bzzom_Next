@@ -1,31 +1,28 @@
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   /* config options here */
-//   reactCompiler: true,
-
-//   images: {
-//     domains: ["images.unsplash.com"],
-//     unoptimized: true,
-//   },
-// };
-
-// export default nextConfig;
 
 
-/** @type {import("next").NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactCompiler: true,
-
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        protocol: 'https',
+        hostname: 'wjonvtrnuspwxabtrqzz.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      // إذا كنت تريد السماح لجميع subdomains لـ Supabase:
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
       },
     ],
-    unoptimized: true,
   },
-};
+}
 
-export default nextConfig;
-
+export default nextConfig

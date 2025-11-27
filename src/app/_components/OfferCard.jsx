@@ -15,11 +15,11 @@ const OfferCard = ({
 
   return (
     <motion.div
+      id={`offer-${offer.id}`} // إضافة ID للربط مع HeroSection
       initial={{ opacity: 0, x: 30 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
-      whileHover={{ y: -5 }}
-      className="bg-black rounded-xl overflow-hidden shadow-xl border-2 border-[#C49A6C] relative shrink-0 w-72 md:w-96"
+      className="bg-black rounded-xl overflow-hidden shadow-xl border-2 border-[#C49A6C] relative shrink-0 w-72 md:w-96 transition-all duration-300"
       onClick={() => onItemClick(offer, 'offer')}
     >
       <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-lg font-bold z-10 text-xs">
@@ -31,7 +31,7 @@ const OfferCard = ({
           alt={offer.title}
           width={384}
           height={192}
-          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+          className="w-full h-full object-cover"
         />
       </div>
       <div className="p-4">
@@ -42,18 +42,16 @@ const OfferCard = ({
           <p className="text-base text-white/40 line-through">{offer.originalPrice}</p>
         </div>
         {showAddButton && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={(e) => {
               e.stopPropagation();
               onAddToCart(offer);
             }}
-            className="w-full bg-[#C49A6C] text-black py-2 rounded-lg font-semibold hover:bg-[#B08A5C] transition-all text-sm flex items-center justify-center gap-2"
+            className="w-full bg-[#C49A6C] text-black py-2 rounded-lg font-semibold transition-all text-sm flex items-center justify-center gap-2"
           >
             <ShoppingCart size={16} />
             <span>اطلب العرض</span>
-          </motion.button>
+          </button>
         )}
       </div>
     </motion.div>

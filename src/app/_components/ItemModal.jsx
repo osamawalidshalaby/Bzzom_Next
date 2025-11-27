@@ -1,18 +1,18 @@
+
 "use client";
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
-import { useApp } from '../layout-client';
 import Image from 'next/image';
 
 const ItemModal = ({ 
   isOpen, 
   onClose, 
   item, 
-  type = 'dish'
+  onAddToCart,
+  playAddToCartSound
 }) => {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useApp();
 
   const increaseQuantity = () => {
     setQuantity(prev => prev + 1);
@@ -25,19 +25,17 @@ const ItemModal = ({
   };
 
   const handleAddToCart = () => {
-    if (type === 'dish') {
-      addToCart({
-        ...item,
-        quantity: quantity
-      });
-    } else {
-      addToCart({
-        id: `offer-${item.id}`,
-        name: item.title,
-        price: item.price,
-        image: item.image,
-        quantity: quantity
-      });
+    if (!item) return;
+
+    const itemToAdd = {
+      ...item,
+      quantity: quantity
+    };
+
+    onAddToCart(itemToAdd);
+    
+    if (playAddToCartSound) {
+      playAddToCartSound();
     }
     
     onClose();
@@ -66,22 +64,25 @@ const ItemModal = ({
         <div className="sticky top-0 bg-zinc-900 p-4 border-b border-zinc-700 flex justify-between items-center">
           <button 
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-zinc-800 transition-colors"
+            className="p-2 rounded-full hover:bg-zinc-800 transition-colors text-white"
           >
             <X size={24} />
           </button>
-          <h2 className="text-xl font-bold text-[#C49A6C]">{item.name || item.title}</h2>
+          <h2 className="text-xl font-bold text-[#C49A6C]">{item.name}</h2>
           <div className="w-10"></div>
         </div>
 
         {/* Image */}
         <div className="h-64 overflow-hidden">
           <Image 
-            src={item.image} 
-            alt={item.name || item.title}
+            src={item.image || "/placeholder-image.jpg"} 
+            alt={item.name}
             width={400}
             height={256}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.src = "/placeholder-image.jpg";
+            }}
           />
         </div>
 
@@ -89,21 +90,24 @@ const ItemModal = ({
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-white mb-1">{item.name || item.title}</h1>
-              <p className="text-white/60">{item.nameEn || item.description}</p>
+              <h1 className="text-2xl font-bold text-white mb-1">{item.name}</h1>
+              {item.name_en && item.name_en.trim() !== "" && (
+                <p className="text-white/60">{item.name_en}</p>
+              )}
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-[#C49A6C]">{item.price}</p>
-              {item.originalPrice && (
-                <p className="text-white/40 line-through">{item.originalPrice}</p>
+              <p className="text-2xl font-bold text-[#C49A6C]">{item.price} ج.م</p>
+              {item.original_price && (
+                <p className="text-white/40 line-through">{item.original_price} ج.م</p>
               )}
             </div>
           </div>
 
-          {/* Description */}
-          <div className="mb-6">
-            <p className="text-white/80 leading-relaxed">{item.details}</p>
-          </div>
+          {item.description && item.description.trim() !== "" && (
+            <div className="mb-6">
+              <p className="text-white/80 leading-relaxed">{item.description}</p>
+            </div>
+          )}
 
           {/* Quantity Selector & Add to Cart */}
           <div className="border-t border-zinc-700 pt-6">
@@ -112,14 +116,14 @@ const ItemModal = ({
               <div className="flex items-center gap-4">
                 <button 
                   onClick={decreaseQuantity}
-                  className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 transition-colors"
+                  className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 transition-colors text-white"
                 >
                   <Minus size={20} />
                 </button>
-                <span className="text-xl font-bold w-8 text-center">{quantity}</span>
+                <span className="text-xl font-bold w-8 text-center text-white">{quantity}</span>
                 <button 
                   onClick={increaseQuantity}
-                  className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 transition-colors"
+                  className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 transition-colors text-white"
                 >
                   <Plus size={20} />
                 </button>
@@ -133,7 +137,7 @@ const ItemModal = ({
               className="w-full bg-[#C49A6C] text-black py-4 rounded-xl font-bold text-lg hover:bg-[#B08A5C] transition-all flex items-center justify-center gap-2"
             >
               <ShoppingCart size={20} />
-              <span>أضف إلى السلة - {item.price}</span>
+              <span>أضف إلى السلة ({quantity}) - {item.price} ج.م</span>
             </motion.button>
           </div>
         </div>

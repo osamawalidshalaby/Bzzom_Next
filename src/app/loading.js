@@ -20,6 +20,7 @@ export default function Spinner({
   speed = 1.2,
   color = "#C49A6C",
   className = "",
+  text = "جارى التحميل",
 }) {
   const spinnerSize = typeof size === "number" ? size : sizes[size] || sizes.md;
 
@@ -27,8 +28,9 @@ export default function Spinner({
     <div
       role="status"
       aria-label="جار التحميل"
-      className={`mt-14 flex items-center justify-center ${className}`}
+      className={`fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-90 z-50 ${className}`}
     >
+      {/* Spinner */}
       <motion.span
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: speed, ease: "linear" }}
@@ -38,8 +40,11 @@ export default function Spinner({
           borderWidth: spinnerSize * 0.12,
           borderColor: `${color} transparent transparent transparent`,
         }}
-        className="rounded-full border-solid border-t-[transparent] border-r-[transparent] border-b-[transparent]"
+        className="rounded-full border-solid border-t-transparent border-r-transparent border-b-transparent mb-4"
       />
+
+      {/* نص التحميل */}
+      <p className="text-white text-lg font-medium mt-4 rtl">{text}</p>
     </div>
   );
 }

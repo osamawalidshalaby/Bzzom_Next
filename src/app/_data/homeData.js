@@ -8,6 +8,7 @@ export const slides = [
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200",
     buttonText: "اطلب الآن",
     bgColor: "from-[#1a1a1a] to-[#2d2d2d]",
+    offerId: 1,
   },
   {
     id: 2,
@@ -17,6 +18,7 @@ export const slides = [
     image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200",
     buttonText: "احجز الآن",
     bgColor: "from-[#1a1a1a] to-[#2d2d2d]",
+    offerId: 2,
   },
   {
     id: 3,
@@ -27,6 +29,7 @@ export const slides = [
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200",
     buttonText: "استفد من العرض",
     bgColor: "from-[#2d2d2d] to-[#1a1a1a]",
+    offerId: 3,
   },
 ];
 

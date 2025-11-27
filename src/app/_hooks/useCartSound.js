@@ -1,15 +1,13 @@
-"use client";
+
+
+
 import { useCallback } from "react";
 
 export const useCartSound = () => {
   const playAddToCartSound = useCallback(() => {
-    if (typeof window === "undefined") return;
-
     try {
-      // محاولة استخدام Web Audio API
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const audioContext = new AudioContext();
-
+      const audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -19,16 +17,16 @@ export const useCartSound = () => {
       oscillator.frequency.value = 800;
       oscillator.type = "sine";
 
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(
-        0.001,
-        audioContext.currentTime + 0.1
+        0.01,
+        audioContext.currentTime + 0.2
       );
 
       oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
+      oscillator.stop(audioContext.currentTime + 0.2);
     } catch (error) {
-      console.log("تعذر تشغيل الصوت");
+      console.log("لا يمكن تشغيل الصوت");
     }
   }, []);
 
