@@ -1,22 +1,11 @@
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://bazzom.shop/</loc>
-    <lastmod>2025-11-27T12:49:36.032Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bazzom.shop/about</loc>
-    <lastmod>2025-11-27T12:49:36.032Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bazzom.shop/menu</loc>
-    <lastmod>2025-11-27T12:49:36.032Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bazzom.shop/reviews</loc>
-    <lastmod>2025-11-27T12:49:36.032Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bazzom.shop/cart</loc>
-    <lastmod>2025-11-27T12:49:36.032Z</lastmod>
-  </url>
-</urlset>;
+export default function sitemap() {
+  const baseUrl = "https://bazzom.shop";
+
+  return [
+    { url: `${baseUrl}/`, lastModified: new Date() },
+    { url: `${baseUrl}/about`, lastModified: new Date() },
+    { url: `${baseUrl}/menu`, lastModified: new Date() },
+    { url: `${baseUrl}/reviews`, lastModified: new Date() },
+    { url: `${baseUrl}/cart`, lastModified: new Date() },
+  ];
+}
