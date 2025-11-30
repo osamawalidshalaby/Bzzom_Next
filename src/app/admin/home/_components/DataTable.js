@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 // import { adminApi } from "../../../_services/adminApi";
 // import toast from "react-hot-toast";
@@ -270,6 +271,8 @@
 
 
 
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "../../../_services/adminApi";
 import toast from "react-hot-toast";
@@ -320,6 +323,7 @@ export default function DataTable({
     },
   });
 
+<<<<<<< HEAD
   const toggleCategoryMutation = useMutation({
     mutationFn: ({ id, isActive }) =>
       adminApi.categories.updateCategory(id, { is_active: isActive }),
@@ -329,6 +333,8 @@ export default function DataTable({
     },
   });
 
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   // Delete mutations
   const deleteSlideMutation = useMutation({
     mutationFn: (id) => adminApi.home.deleteSlide(id),
@@ -354,6 +360,7 @@ export default function DataTable({
     },
   });
 
+<<<<<<< HEAD
   const deleteCategoryMutation = useMutation({
     mutationFn: (id) => adminApi.categories.deleteCategory(id),
     onSuccess: () => {
@@ -362,6 +369,8 @@ export default function DataTable({
     },
   });
 
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   const toggleActive = (id) => {
     const item = data.find((item) => item.id === id);
     if (!item) return;
@@ -378,9 +387,12 @@ export default function DataTable({
       case "offers":
         toggleOfferMutation.mutate({ id, isActive: newActiveState });
         break;
+<<<<<<< HEAD
       case "categories":
         toggleCategoryMutation.mutate({ id, isActive: newActiveState });
         break;
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
     }
   };
 
@@ -397,9 +409,12 @@ export default function DataTable({
       case "offers":
         deleteOfferMutation.mutate(id);
         break;
+<<<<<<< HEAD
       case "categories":
         deleteCategoryMutation.mutate(id);
         break;
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
     }
   };
 
@@ -411,8 +426,11 @@ export default function DataTable({
         return "الأطباق المميزة";
       case "offers":
         return "العروض الخاصة";
+<<<<<<< HEAD
       case "categories":
         return "التصنيفات";
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       default:
         return "";
     }
@@ -421,17 +439,24 @@ export default function DataTable({
   const getCellContent = (item, column) => {
     switch (column) {
       case "الاسم":
+<<<<<<< HEAD
         return item.name || item.name_ar;
+=======
+        return item.name;
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       case "العنوان":
         return item.title;
       case "السعر":
         return item.price;
       case "الوصف":
         return item.subtitle || item.description || "";
+<<<<<<< HEAD
       case "الاسم العربي":
         return item.name_ar;
       case "الاسم الإنجليزي":
         return item.name_en;
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       case "الحالة":
         return (
           <span
@@ -449,19 +474,28 @@ export default function DataTable({
     }
   };
 
+<<<<<<< HEAD
   const getImageUrl = (item) => {
     return item.image || item.image_url;
   };
 
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   const isMutationPending =
     toggleSlideMutation.isPending ||
     toggleDishMutation.isPending ||
     toggleOfferMutation.isPending ||
+<<<<<<< HEAD
     toggleCategoryMutation.isPending ||
     deleteSlideMutation.isPending ||
     deleteDishMutation.isPending ||
     deleteOfferMutation.isPending ||
     deleteCategoryMutation.isPending;
+=======
+    deleteSlideMutation.isPending ||
+    deleteDishMutation.isPending ||
+    deleteOfferMutation.isPending;
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 
   return (
     <div className="bg-zinc-900 rounded-xl border border-[#C49A6C]/20 overflow-hidden">
@@ -520,10 +554,17 @@ export default function DataTable({
                     </td>
                   ))}
                   <td className="px-4 sm:px-6 py-4">
+<<<<<<< HEAD
                     {getImageUrl(item) ? (
                       <img
                         src={getImageUrl(item)}
                         alt={item.title || item.name || item.name_ar}
+=======
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.title || item.name}
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                         className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover"
                       />
                     ) : (

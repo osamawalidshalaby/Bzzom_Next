@@ -1,4 +1,5 @@
 import HomeClient from "./HomeClient";
+<<<<<<< HEAD
 import supabase from "./_services/supabase";
 
 
@@ -30,3 +31,12 @@ export default async function Home() {
 
 
 
+=======
+import { homeMetadata } from "./metadata";
+
+export const metadata = homeMetadata;
+
+export default function Home() {
+  return <HomeClient />;
+}
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a

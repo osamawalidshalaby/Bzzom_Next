@@ -61,7 +61,11 @@ const Footer = () => {
             <h4 className="text-lg font-bold text-[#C49A6C] mb-4">معلومات التواصل</h4>
             <ul className="space-y-2 text-white/60 text-sm">
               <li>دمياط، ميدان الساعة</li>
+<<<<<<< HEAD
               <li>bazzomrestaurant@gmail.com</li>
+=======
+              <li>info@bazzom.com</li>
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
               <li>01010882822</li>
             </ul>
           </div>

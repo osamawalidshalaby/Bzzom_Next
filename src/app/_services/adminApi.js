@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import { supabase } from "./supabase";
 // import { storageApi } from "./storage";
 
@@ -458,6 +459,8 @@
 
 
 
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 import { supabase } from "./supabase";
 import { storageApi } from "./storage";
 
@@ -718,6 +721,7 @@ export const offersApi = {
   },
 };
 
+<<<<<<< HEAD
 // Categories API - الجديد
 export const categoriesApi = {
   getCategories: async () => {
@@ -806,6 +810,9 @@ export const categoriesApi = {
 };
 
 // باقي ال APIs...
+=======
+// باقي ال APIs بنفس الطريقة...
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 export const menuCategoriesApi = {
   getCategories: async () => {
     const { data, error } = await supabase
@@ -995,7 +1002,10 @@ export const adminApi = {
   home: homeApi,
   featuredDishes: featuredDishesApi,
   offers: offersApi,
+<<<<<<< HEAD
   categories: categoriesApi, // تمت الإضافة
+=======
+>>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   menuCategories: menuCategoriesApi,
   menuItems: menuItemsApi,
   auth: authApi,
