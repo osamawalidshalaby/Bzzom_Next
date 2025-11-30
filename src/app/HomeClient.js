@@ -1,13 +1,6 @@
-<<<<<<< HEAD
 // HomeClient.js
 "use client";
 import { useState, useEffect } from "react";
-=======
-
-"use client";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 import Link from "next/link";
 import {
   CreditCard,
@@ -52,11 +45,7 @@ import {
   paymentMethods,
 } from "../app/_data/homeData";
 
-<<<<<<< HEAD
 export default function HomeClient({ slides, categories }) {
-=======
-export default function HomeClient() {
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   const { addToCart } = useApp();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -176,16 +165,11 @@ export default function HomeClient() {
         />
 
         {/* Categories Section */}
-<<<<<<< HEAD
         <CategoriesSection categories={categories} />
-=======
-        <CategoriesSection />
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 
         {/* Featured Dishes Section */}
         <section className="py-12 md:py-20 px-4 bg-linear-to-b from-black to-zinc-900 w-full">
           <div className="max-w-7xl mx-auto w-full">
-<<<<<<< HEAD
             <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word">
               أطباقنا المميزة
             </h2>
@@ -195,28 +179,6 @@ export default function HomeClient() {
 
             <HorizontalScrollContainer>
               {featuredDishes.map((dish) => (
-=======
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word"
-            >
-              أطباقنا المميزة
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-lg md:text-xl text-white/60 mb-8 md:mb-12 text-center break-words"
-            >
-              اكتشف أشهى الأطباق العربية الأصيلة
-            </motion.p>
-
-            <HorizontalScrollContainer>
-              {featuredDishes.map((dish, idx) => (
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                 <DishCard
                   key={dish.id}
                   dish={dish}
@@ -234,7 +196,6 @@ export default function HomeClient() {
           className="py-4 md:py-8 px-4 bg-zinc-900 w-full"
         >
           <div className="max-w-7xl mx-auto w-full">
-<<<<<<< HEAD
             <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word">
               العروض الخاصة
             </h2>
@@ -244,28 +205,6 @@ export default function HomeClient() {
 
             <HorizontalScrollContainer>
               {offers.map((offer) => (
-=======
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word"
-            >
-              العروض الخاصة
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-lg md:text-xl text-white/60 mb-8 md:mb-12 text-center wrap-break-word"
-            >
-              استفد من عروضنا الحصرية ووفر أكثر
-            </motion.p>
-
-            <HorizontalScrollContainer>
-              {offers.map((offer, idx) => (
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                 <OfferCard
                   key={offer.id}
                   offer={offer}
@@ -283,7 +222,6 @@ export default function HomeClient() {
         {/* Contact & Payment Methods Section */}
         <section className="py-16 md:py-20 px-4 bg-black w-full">
           <div className="max-w-7xl mx-auto w-full">
-<<<<<<< HEAD
             <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-8 md:mb-12 text-center wrap-break-word">
               تواصل معنا
             </h2>
@@ -291,25 +229,6 @@ export default function HomeClient() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 w-full">
               {/* Contact Methods */}
               <div className="w-full">
-=======
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-8 md:mb-12 text-center wrap-break-word"
-            >
-              تواصل معنا
-            </motion.h2>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 w-full">
-              {/* Contact Methods */}
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="w-full"
-              >
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                 <h3 className="text-2xl md:text-3xl font-bold text-[#C49A6C] mb-4 md:mb-6 wrap-break-word">
                   وسائل التواصل
                 </h3>
@@ -319,38 +238,17 @@ export default function HomeClient() {
                   onEmailClick={handleEmailClick}
                   onLocationClick={handleLocationClick}
                 />
-<<<<<<< HEAD
               </div>
 
               {/* Payment Methods */}
               <div className="w-full">
-=======
-              </motion.div>
-
-              {/* Payment Methods */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="w-full"
-              >
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                 <h3 className="text-2xl md:text-3xl font-bold text-[#C49A6C] mb-4 md:mb-6 wrap-break-word">
                   طرق الدفع
                 </h3>
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
                   {paymentMethods.map((method, idx) => (
-<<<<<<< HEAD
                     <div
                       key={idx}
-=======
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.2 + idx * 0.1 }}
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                       className="bg-zinc-900 p-3 md:p-4 rounded-xl border border-[#C49A6C]/20 text-center hover:border-[#C49A6C] transition-all w-full"
                     >
                       <CreditCard
@@ -365,26 +263,12 @@ export default function HomeClient() {
                           {method.number}
                         </p>
                       )}
-<<<<<<< HEAD
                     </div>
-=======
-                    </motion.div>
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                   ))}
                 </div>
 
                 {/* Working Hours */}
-<<<<<<< HEAD
                 <div className="bg-zinc-900 p-4 md:p-6 rounded-xl border border-[#C49A6C]/20 mt-4 md:mt-6 w-full">
-=======
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.6 }}
-                  className="bg-zinc-900 p-4 md:p-6 rounded-xl border border-[#C49A6C]/20 mt-4 md:mt-6 w-full"
-                >
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
                   <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
                     <Clock className="text-[#C49A6C]" size={20} />
                     <h4 className="text-lg md:text-xl font-bold text-[#C49A6C]">
@@ -393,7 +277,6 @@ export default function HomeClient() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm md:text-base">
-<<<<<<< HEAD
                       <span className="text-white/70">الأحد - السبت</span>
                       <span className="text-white font-semibold">
                         11:00 ص - 2:00 ص
@@ -402,22 +285,6 @@ export default function HomeClient() {
                   </div>
                 </div>
               </div>
-=======
-                      <span className="text-white/70">الأحد - الخميس</span>
-                      <span className="text-white font-semibold">
-                        9:00 ص - 12:00 م
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm md:text-base">
-                      <span className="text-white/70">الجمعة - السبت</span>
-                      <span className="text-white font-semibold">
-                        10:00 ص - 1:00 ص
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
             </div>
           </div>
         </section>
@@ -429,7 +296,6 @@ export default function HomeClient() {
         <Footer />
 
         {/* Item Modal */}
-<<<<<<< HEAD
         {selectedItem && (
           <ItemModal
             isOpen={!!selectedItem}
@@ -444,21 +310,3 @@ export default function HomeClient() {
     </>
   );
 }
-=======
-        <AnimatePresence>
-          {selectedItem && (
-            <ItemModal
-              isOpen={!!selectedItem}
-              onClose={closeItemDetails}
-              item={selectedItem}
-              type={selectedItem.type}
-              onAddToCart={handleModalAddToCart}
-              playAddToCartSound={playAddToCartSound}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-    </>
-  );
-}
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a

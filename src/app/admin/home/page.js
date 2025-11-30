@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // "use client";
 // import { useEffect, useState } from "react";
 // import { useRouter } from "next/navigation";
@@ -152,8 +151,6 @@
 
 
 
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -200,15 +197,12 @@ export default function AdminHomeControl() {
     enabled: isAuthenticated,
   });
 
-<<<<<<< HEAD
   const { data: categories = [], isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: adminApi.categories.getCategories,
     enabled: isAuthenticated,
   });
 
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   const handleAddNew = () => {
     setEditingItem(null);
     setShowAddModal(true);
@@ -254,15 +248,12 @@ export default function AdminHomeControl() {
           loading: offersLoading,
           columns: ["العنوان", "السعر", "الحالة"],
         };
-<<<<<<< HEAD
       case "categories":
         return {
           data: categories,
           loading: categoriesLoading,
           columns: ["الاسم العربي", "الاسم الإنجليزي", "الحالة"],
         };
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       default:
         return { data: [], loading: false, columns: [] };
     }
@@ -298,10 +289,7 @@ export default function AdminHomeControl() {
             { id: "slides", label: "الشرائح" },
             { id: "dishes", label: "الأطباق المميزة" },
             { id: "offers", label: "العروض" },
-<<<<<<< HEAD
             { id: "categories", label: "التصنيفات" }, // تمت الإضافة
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
           ]}
         />
 
@@ -326,7 +314,3 @@ export default function AdminHomeControl() {
     </div>
   );
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a

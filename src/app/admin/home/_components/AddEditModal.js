@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // import { useState } from "react";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 // import { adminApi } from "../../../_services/adminApi";
@@ -454,8 +453,6 @@
 
 
 
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "../../../_services/adminApi";
@@ -468,11 +465,8 @@ export default function AddEditModal({ type, editingItem, onClose }) {
     subtitle: editingItem?.subtitle || "",
     description: editingItem?.description || "",
     name: editingItem?.name || "",
-<<<<<<< HEAD
     name_ar: editingItem?.name_ar || "",
     name_en: editingItem?.name_en || "",
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
     price: editingItem?.price || "",
     original_price: editingItem?.original_price || "",
     button_text: editingItem?.button_text || "",
@@ -484,11 +478,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
   });
 
   const [imageFile, setImageFile] = useState(null);
-<<<<<<< HEAD
   const [imagePreview, setImagePreview] = useState(editingItem?.image || editingItem?.image_url || "");
-=======
-  const [imagePreview, setImagePreview] = useState(editingItem?.image || "");
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   const queryClient = useQueryClient();
 
   // Handle image upload
@@ -530,7 +520,6 @@ export default function AddEditModal({ type, editingItem, onClose }) {
     },
   });
 
-<<<<<<< HEAD
   const createCategoryMutation = useMutation({
     mutationFn: (data) => adminApi.categories.createCategory(data, imageFile),
     onSuccess: () => {
@@ -540,8 +529,6 @@ export default function AddEditModal({ type, editingItem, onClose }) {
     },
   });
 
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   // Update mutations
   const updateSlideMutation = useMutation({
     mutationFn: ({ id, data }) =>
@@ -573,7 +560,6 @@ export default function AddEditModal({ type, editingItem, onClose }) {
     },
   });
 
-<<<<<<< HEAD
   const updateCategoryMutation = useMutation({
     mutationFn: ({ id, data }) =>
       adminApi.categories.updateCategory(id, data, imageFile),
@@ -584,8 +570,6 @@ export default function AddEditModal({ type, editingItem, onClose }) {
     },
   });
 
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -601,12 +585,9 @@ export default function AddEditModal({ type, editingItem, onClose }) {
         case "offers":
           updateOfferMutation.mutate({ id: editingItem.id, data: formData });
           break;
-<<<<<<< HEAD
         case "categories":
           updateCategoryMutation.mutate({ id: editingItem.id, data: formData });
           break;
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       }
     } else {
       // Create new item
@@ -620,12 +601,9 @@ export default function AddEditModal({ type, editingItem, onClose }) {
         case "offers":
           createOfferMutation.mutate(formData);
           break;
-<<<<<<< HEAD
         case "categories":
           createCategoryMutation.mutate(formData);
           break;
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       }
     }
   };
@@ -634,22 +612,15 @@ export default function AddEditModal({ type, editingItem, onClose }) {
     createSlideMutation.isPending ||
     createDishMutation.isPending ||
     createOfferMutation.isPending ||
-<<<<<<< HEAD
     createCategoryMutation.isPending ||
     updateSlideMutation.isPending ||
     updateDishMutation.isPending ||
     updateOfferMutation.isPending ||
     updateCategoryMutation.isPending;
-=======
-    updateSlideMutation.isPending ||
-    updateDishMutation.isPending ||
-    updateOfferMutation.isPending;
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 
   const getModalTitle = () => {
     const action = editingItem ? "تعديل" : "إضافة";
     const itemType =
-<<<<<<< HEAD
       type === "slides" 
         ? "شريحة" 
         : type === "dishes" 
@@ -657,9 +628,6 @@ export default function AddEditModal({ type, editingItem, onClose }) {
         : type === "offers" 
         ? "عرض" 
         : "تصنيف";
-=======
-      type === "slides" ? "شريحة" : type === "dishes" ? "طبق مميز" : "عرض";
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
 
     return `${action} ${itemType}`;
   };
@@ -856,7 +824,6 @@ export default function AddEditModal({ type, editingItem, onClose }) {
             </div>
           </>
         );
-<<<<<<< HEAD
 
       case "categories":
         return (
@@ -907,8 +874,6 @@ export default function AddEditModal({ type, editingItem, onClose }) {
             </div>
           </>
         );
-=======
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
     }
   };
 

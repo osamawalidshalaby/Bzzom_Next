@@ -13,11 +13,7 @@ const ContactMethods = ({
     {
       icon: Phone,
       label: 'الهاتف',
-<<<<<<< HEAD
       value: ' 01007576444',
-=======
-      value: '01010882822',
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       action: () => onPhoneClick('01010882822'),
       color: 'bg-green-600 hover:bg-green-700'
     },
@@ -31,22 +27,14 @@ const ContactMethods = ({
     {
       icon: Mail,
       label: 'البريد الإلكتروني',
-<<<<<<< HEAD
       value: 'bazzomrestaurant@gmail.com',
-=======
-      value: 'info@bazzom.com',
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       action: () => onEmailClick('info@bazzom.com'),
       color: 'bg-red-600 hover:bg-red-700'
     },
     {
       icon: MapPin,
       label: 'العنوان',
-<<<<<<< HEAD
       value: 'ميدان الساعة , بجوار, البوسطة, Damietta Governorate 34511',
-=======
-      value: 'ميدان الساعة , بجوار, البوسطة, محافظة دمياط',
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
       action: onLocationClick,
       color: 'bg-blue-600 hover:bg-blue-700'
     }

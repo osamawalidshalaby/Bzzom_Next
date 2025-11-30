@@ -1,5 +1,4 @@
 import HomeClient from "./HomeClient";
-<<<<<<< HEAD
 import supabase from "./_services/supabase";
 
 
@@ -24,19 +23,10 @@ export default async function Home() {
 
   if (slideError) console.error(error);
 
-  console.log(categories)
+
 
   return <HomeClient slides={slides} categories={categories} />;
 }
 
 
 
-=======
-import { homeMetadata } from "./metadata";
-
-export const metadata = homeMetadata;
-
-export default function Home() {
-  return <HomeClient />;
-}
->>>>>>> 90741381b159bb0bbfef273258d16b906108584a
