@@ -4,7 +4,6 @@
 const nextConfig = {
   images: {
     formats: ["image/webp", "image/avif"], // دعم الصور الحديثة
-    minimumCacheTTL: 60 * 60 * 24, // كاش لمدة يوم
     remotePatterns: [
       {
         protocol: "https",

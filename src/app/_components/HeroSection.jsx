@@ -1,12 +1,26 @@
-// HeroSection.jsx
+
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useQuery } from "@tanstack/react-query";
+import { adminApi } from "../_services/adminApi";
 
-const HeroSection = ({ slides, currentSlide, goToSlide }) => {
+const HeroSection = ({  currentSlide, goToSlide }) => {
   const [autoPlay, setAutoPlay] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState([]);
+
+
+  const {
+    data: slides = [],
+    isLoading: categoriesLoading,
+    refetch: refetchCategories,
+  } = useQuery({
+    queryKey: ["home_slides"],
+    queryFn: adminApi.home.getSlides,
+  });
 
   const nextSlide = useCallback(() => {
     goToSlide((currentSlide + 1) % slides.length);
@@ -15,6 +29,10 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
   const prevSlide = useCallback(() => {
     goToSlide((currentSlide - 1 + slides.length) % slides.length);
   }, [currentSlide, goToSlide, slides.length]);
+
+  const handleImageLoad = useCallback((index) => {
+    setImagesLoaded(prev => [...prev, index]);
+  }, []);
 
   useEffect(() => {
     if (!autoPlay) return;
@@ -58,6 +76,9 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
     }
   };
 
+  
+
+
   return (
     <section 
       className="h-[40vh] min-h-[300px] relative overflow-hidden mt-16"
@@ -66,11 +87,14 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
     >
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
-          <div
+          <motion.div
             key={slide.id}
-            className={`absolute inset-0 ${slide.bgColor} flex items-center justify-center transition-opacity duration-500 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: index === currentSlide ? 1 : 0,
+            }}
+            transition={{ duration: 0.5 }}
+            className={`absolute inset-0 ${slide.bgColor} flex items-center justify-center`}
           >
             {/* الصورة مع رابط يؤدي للعرض الخاص */}
             <Link 
@@ -94,8 +118,9 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
                   alt={slide.title}
                   fill
                   className="object-cover"
-                  priority={true}
-                  loading='eager'
+                  priority={index === 0}
+                  onLoad={() => handleImageLoad(index)}
+  
                 />
               </div>
             </Link>
@@ -103,9 +128,21 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
             {/* Overlay للتدرج السلس */}
             <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/80"></div>
             
-            {/* المحتوة مع النصوص فقط */}
+            {/* المحتوى مع النصوص فقط */}
             <div className="relative z-10 text-center px-4 max-w-4xl">
-              <h1 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg cursor-pointer"
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="mb-4"
+              >
+              </motion.div>
+              
+              <motion.h1
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (slide.offerId) {
@@ -119,9 +156,13 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
                 }}
               >
                 {slide.title}
-              </h1>
+              </motion.h1>
               
-              <h2 className="text-base md:text-lg text-white/95 mb-1.5 drop-shadow-md cursor-pointer"
+              <motion.h2
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-base md:text-lg text-white/95 mb-1.5 drop-shadow-md cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (slide.offerId) {
@@ -135,9 +176,13 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
                 }}
               >
                 {slide.subtitle}
-              </h2>
+              </motion.h2>
               
-              <p className="text-white/90 max-w-2xl mx-auto text-xs md:text-sm drop-shadow-md cursor-pointer"
+              <motion.p
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-white/90 max-w-2xl mx-auto text-xs md:text-sm drop-shadow-md cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (slide.offerId) {
@@ -151,10 +196,15 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
                 }}
               >
                 {slide.description}
-              </p>
+              </motion.p>
 
               {/* زر اضافي للانتقال للعروض */}
-              <div className="mt-4">
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="mt-4"
+              >
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -167,13 +217,13 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
                       }
                     }
                   }}
-                  className="bg-[#C49A6C] text-black px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-[#d4af7c]"
+                  className="bg-[#C49A6C] text-black px-4 py-2 rounded-lg text-sm font-semibold transition-all"
                 >
                   {slide.offerId ? 'اطلب هذا العرض' : 'استعرض العروض'}
                 </button>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
@@ -209,6 +259,13 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
           />
         ))}
       </div>
+
+      {/* Loading State */}
+      {imagesLoaded.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center z-30 bg-gray-900/30">
+          <div className="text-white text-xs">جاري التحميل...</div>
+        </div>
+      )}
     </section>
   );
 };

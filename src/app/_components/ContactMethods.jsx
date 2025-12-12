@@ -13,7 +13,7 @@ const ContactMethods = ({
     {
       icon: Phone,
       label: 'الهاتف',
-      value: ' 01007576444',
+      value: '01010882822',
       action: () => onPhoneClick('01010882822'),
       color: 'bg-green-600 hover:bg-green-700'
     },
@@ -27,14 +27,14 @@ const ContactMethods = ({
     {
       icon: Mail,
       label: 'البريد الإلكتروني',
-      value: 'bazzomrestaurant@gmail.com',
+      value: 'info@bazzom.com',
       action: () => onEmailClick('info@bazzom.com'),
       color: 'bg-red-600 hover:bg-red-700'
     },
     {
       icon: MapPin,
       label: 'العنوان',
-      value: 'ميدان الساعة , بجوار, البوسطة, Damietta Governorate 34511',
+      value: 'ميدان الساعة , بجوار, البوسطة, محافظة دمياط',
       action: onLocationClick,
       color: 'bg-blue-600 hover:bg-blue-700'
     }
