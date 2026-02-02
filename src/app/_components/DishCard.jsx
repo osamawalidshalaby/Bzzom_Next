@@ -42,13 +42,13 @@ const DishCard = ({
       </div>
       <div className="p-4">
         <h3 className="text-lg font-bold text-[#C49A6C] mb-1 wrap-break-word">{dish.name}</h3>
-        <p className="text-white/60 text-sm mb-1">{dish.nameEn}</p>
-        <p className="text-white/70 text-sm mb-3 line-clamp-2">{dish.desc}</p>
+        <p className="text-white/60 text-sm mb-1">{dish.name_en}</p>
+        <p className="text-white/70 text-sm mb-3 line-clamp-2">{dish.description}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <p className="text-lg font-bold text-white">{dish.price}</p>
-            {dish.originalPrice && (
-              <p className="text-sm text-white/40 line-through">{dish.originalPrice}</p>
+            <p className="text-lg font-bold text-white"> {dish.price}   ج م </p>
+            {dish.original_price && (
+              <p className="text-sm text-white/40 line-through">{dish.original_price} ج م</p>
             )}
           </div>
           {showAddButton && (

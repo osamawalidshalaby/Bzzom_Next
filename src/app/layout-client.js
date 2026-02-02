@@ -1,10 +1,10 @@
-
 // app/layout-client.js (Client Component)
 "use client";
 import { useState, createContext, useContext, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import Navigation from "../app/_components/Navigation";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Tajawal } from "next/font/google";
 import "./globals.css";
 
@@ -31,41 +31,91 @@ export default function ClientLayout({ children }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 دقيقة
+            staleTime: 1000 * 60, // دقيقة واحدة
+            gcTime: 1000 * 60 * 5, // 5 دقائق
+            retry: 1,
             refetchOnWindowFocus: false,
           },
         },
       })
   );
   const [cart, setCart] = useState([]);
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: "عمر الشمري",
-      rating: 5,
-      message: "تجربة رائعة وطعام لذيذ جداً",
-    },
-    {
-      id: 2,
-      name: "Sara Ahmed",
-      rating: 5,
-      message: "Best Arabic restaurant in town!",
-    },
-  ]);
-
-
 
   const addToCart = (item) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
+
+      // إذا كان العنصر له حجم محدد (مشويات)، لا ندمج مع العناصر الأخرى
+      if (item.selectedSize) {
+        // نتحقق إذا كان نفس العنصر بنفس الحجم موجود
+        const existingItemWithSameSize = prevCart.find(
+          (cartItem) =>
+            cartItem.id === item.id &&
+            cartItem.selectedSize === item.selectedSize
         );
+
+        if (existingItemWithSameSize) {
+          // نزيد الكمية فقط إذا كان نفس العنصر بنفس الحجم
+          return prevCart.map((cartItem) =>
+            cartItem.id === item.id &&
+            cartItem.selectedSize === item.selectedSize
+              ? {
+                  ...cartItem,
+                  quantity: cartItem.quantity + (item.quantity || 1),
+                  calculatedPrice:
+                    (cartItem.calculatedPrice ||
+                      parseFloat(
+                        cartItem.price.toString().replace(/[^0-9.]/g, "")
+                      )) +
+                    (item.calculatedPrice ||
+                      parseFloat(
+                        item.price.toString().replace(/[^0-9.]/g, "")
+                      ) * (item.quantity || 1)),
+                }
+              : cartItem
+          );
+        } else {
+          // إضافة عنصر جديد بحجم مختلف
+          return [
+            ...prevCart,
+            {
+              ...item,
+              quantity: item.quantity || 1,
+              calculatedPrice:
+                item.calculatedPrice ||
+                parseFloat(item.price.toString().replace(/[^0-9.]/g, "")) *
+                  (item.quantity || 1),
+            },
+          ];
+        }
       } else {
-        return [...prevCart, { ...item, quantity: 1 }];
+        // العناصر العادية (بدون أحجام)
+        if (existingItem) {
+          return prevCart.map((cartItem) =>
+            cartItem.id === item.id
+              ? {
+                  ...cartItem,
+                  quantity: cartItem.quantity + (item.quantity || 1),
+                  calculatedPrice: cartItem.calculatedPrice
+                    ? cartItem.calculatedPrice +
+                      (item.calculatedPrice ||
+                        parseFloat(
+                          item.price.toString().replace(/[^0-9.]/g, "")
+                        ) * (item.quantity || 1))
+                    : null,
+                }
+              : cartItem
+          );
+        } else {
+          return [
+            ...prevCart,
+            {
+              ...item,
+              quantity: item.quantity || 1,
+              calculatedPrice: item.calculatedPrice || null,
+            },
+          ];
+        }
       }
     });
   };
@@ -95,8 +145,6 @@ export default function ClientLayout({ children }) {
 
   const value = {
     cart,
-    reviews,
-    setReviews,
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -108,6 +156,7 @@ export default function ClientLayout({ children }) {
     <html lang="ar" dir="rtl">
       <body className={tajawal.className}>
         <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} />
           <AppContext.Provider value={value}>
             <div className="font-['Tajawal'] bg-black min-h-screen">
               <Navigation />

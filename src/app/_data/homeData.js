@@ -149,8 +149,8 @@ export const restaurantPhotos = [
 ];
 
 export const paymentMethods = [
-  { name: "ڤودافون كاش", number: "01000000000", icon: "CreditCard" },
-  { name: "إنستا باي", number: "01000000000", icon: "CreditCard" },
+  { name: "ڤودافون كاش", number: "01007576444", icon: "CreditCard" },
+  { name: "إنستا باي", number: "01007576444", icon: "CreditCard" },
   { name: "بطاقات ائتمان", number: "Visa/MasterCard", icon: "CreditCard" },
   { name: "الدفع عند الاستلام", number: "", icon: "CreditCard" },
 ];
@@ -175,7 +175,7 @@ export const contactInfo = [
   {
     icon: "Mail",
     label: "البريد الإلكتروني",
-    value: "info@bazzom.com",
+    value: "bazzomrestaurant@gmail.com",
     color: "bg-red-600 hover:bg-red-700",
   },
   {

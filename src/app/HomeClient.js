@@ -1,24 +1,10 @@
-
+// HomeClient.js
 "use client";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   CreditCard,
-  Phone,
-  Mail,
-  MapPin,
-  WheatIcon,
-  Star,
   Clock,
-  Users,
-  Facebook,
-  Instagram,
-  Twitter,
-  X,
-  Plus,
-  Minus,
-  ShoppingCart,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useApp } from "./layout-client";
@@ -35,23 +21,27 @@ import StatsSection from "../app/_components/StatsSection";
 import Footer from "../app/_components/Footer";
 import CategoriesSection from "../app/_components/CategoriesSection";
 
+// Data Hooks
+import { useFeaturedDishes, useOffers } from "../app/_hooks/useQueries";
+
 // Hooks
 import { useCartSound } from "../app/_hooks/useCartSound";
 
 import {
-  slides,
-  featuredDishes,
-  offers,
   restaurantPhotos,
   paymentMethods,
 } from "../app/_data/homeData";
 
-export default function HomeClient() {
+export default function HomeClient({ slides, categories, featuredDishes, offers }) {
   const { addToCart } = useApp();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedItem, setSelectedItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const { playAddToCartSound } = useCartSound();
+
+  // const { featuredDishes, isLoading: isFeaturedDishesLoading } =
+  //   useFeaturedDishes();
+  // const { offers, isLoading: isOffersLoading } = useOffers();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -166,31 +156,20 @@ export default function HomeClient() {
         />
 
         {/* Categories Section */}
-        <CategoriesSection />
+        <CategoriesSection categories={categories} />
 
         {/* Featured Dishes Section */}
         <section className="py-12 md:py-20 px-4 bg-linear-to-b from-black to-zinc-900 w-full">
           <div className="max-w-7xl mx-auto w-full">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word"
-            >
+            <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word">
               أطباقنا المميزة
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-lg md:text-xl text-white/60 mb-8 md:mb-12 text-center break-words"
-            >
-              اكتشف أشهى الأطباق العربية الأصيلة
-            </motion.p>
+            </h2>
+            <p className="text-lg md:text-xl text-white/60 mb-8 md:mb-12 text-center wrap-break-word">
+              اكتشف أشهى أطباق مطعم بزوم
+            </p>
 
             <HorizontalScrollContainer>
-              {featuredDishes.map((dish, idx) => (
+              {featuredDishes.map((dish) => (
                 <DishCard
                   key={dish.id}
                   dish={dish}
@@ -208,26 +187,15 @@ export default function HomeClient() {
           className="py-4 md:py-8 px-4 bg-zinc-900 w-full"
         >
           <div className="max-w-7xl mx-auto w-full">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word"
-            >
+            <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word">
               العروض الخاصة
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-lg md:text-xl text-white/60 mb-8 md:mb-12 text-center wrap-break-word"
-            >
+            </h2>
+            <p className="text-lg md:text-xl text-white/60 mb-8 md:mb-12 text-center wrap-break-word">
               استفد من عروضنا الحصرية ووفر أكثر
-            </motion.p>
+            </p>
 
             <HorizontalScrollContainer>
-              {offers.map((offer, idx) => (
+              {offers.map((offer) => (
                 <OfferCard
                   key={offer.id}
                   offer={offer}
@@ -245,23 +213,13 @@ export default function HomeClient() {
         {/* Contact & Payment Methods Section */}
         <section className="py-16 md:py-20 px-4 bg-black w-full">
           <div className="max-w-7xl mx-auto w-full">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-8 md:mb-12 text-center wrap-break-word"
-            >
+            <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-8 md:mb-12 text-center wrap-break-word">
               تواصل معنا
-            </motion.h2>
+            </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 w-full">
               {/* Contact Methods */}
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="w-full"
-              >
+              <div className="w-full">
                 <h3 className="text-2xl md:text-3xl font-bold text-[#C49A6C] mb-4 md:mb-6 wrap-break-word">
                   وسائل التواصل
                 </h3>
@@ -271,26 +229,17 @@ export default function HomeClient() {
                   onEmailClick={handleEmailClick}
                   onLocationClick={handleLocationClick}
                 />
-              </motion.div>
+              </div>
 
               {/* Payment Methods */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="w-full"
-              >
+              <div className="w-full">
                 <h3 className="text-2xl md:text-3xl font-bold text-[#C49A6C] mb-4 md:mb-6 wrap-break-word">
                   طرق الدفع
                 </h3>
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
                   {paymentMethods.map((method, idx) => (
-                    <motion.div
+                    <div
                       key={idx}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.2 + idx * 0.1 }}
                       className="bg-zinc-900 p-3 md:p-4 rounded-xl border border-[#C49A6C]/20 text-center hover:border-[#C49A6C] transition-all w-full"
                     >
                       <CreditCard
@@ -305,18 +254,12 @@ export default function HomeClient() {
                           {method.number}
                         </p>
                       )}
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
 
                 {/* Working Hours */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.6 }}
-                  className="bg-zinc-900 p-4 md:p-6 rounded-xl border border-[#C49A6C]/20 mt-4 md:mt-6 w-full"
-                >
+                <div className="bg-zinc-900 p-4 md:p-6 rounded-xl border border-[#C49A6C]/20 mt-4 md:mt-6 w-full">
                   <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
                     <Clock className="text-[#C49A6C]" size={20} />
                     <h4 className="text-lg md:text-xl font-bold text-[#C49A6C]">
@@ -325,20 +268,14 @@ export default function HomeClient() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm md:text-base">
-                      <span className="text-white/70">الأحد - الخميس</span>
+                      <span className="text-white/70">الأحد - السبت</span>
                       <span className="text-white font-semibold">
-                        9:00 ص - 12:00 م
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm md:text-base">
-                      <span className="text-white/70">الجمعة - السبت</span>
-                      <span className="text-white font-semibold">
-                        10:00 ص - 1:00 ص
+                        11:00 ص - 2:00 ص
                       </span>
                     </div>
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -350,18 +287,16 @@ export default function HomeClient() {
         <Footer />
 
         {/* Item Modal */}
-        <AnimatePresence>
-          {selectedItem && (
-            <ItemModal
-              isOpen={!!selectedItem}
-              onClose={closeItemDetails}
-              item={selectedItem}
-              type={selectedItem.type}
-              onAddToCart={handleModalAddToCart}
-              playAddToCartSound={playAddToCartSound}
-            />
-          )}
-        </AnimatePresence>
+        {selectedItem && (
+          <ItemModal
+            isOpen={!!selectedItem}
+            onClose={closeItemDetails}
+            item={selectedItem}
+            type={selectedItem.type}
+            onAddToCart={handleModalAddToCart}
+            playAddToCartSound={playAddToCartSound}
+          />
+        )}
       </div>
     </>
   );

@@ -38,8 +38,8 @@ const OfferCard = ({
         <h3 className="text-xl font-bold text-[#C49A6C] mb-2 wrap-break-word">{offer.title}</h3>
         <p className="text-white/70 text-sm mb-4 line-clamp-2">{offer.description}</p>
         <div className="flex items-center gap-3 mb-4">
-          <p className="text-xl font-bold text-white">{offer.price}</p>
-          <p className="text-base text-white/40 line-through">{offer.originalPrice}</p>
+          <p className="text-xl font-bold text-white">{offer.price} ج م</p>
+          <p className="text-base text-white/40 line-through">{offer.original_price} ج م</p>
         </div>
         {showAddButton && (
           <button
