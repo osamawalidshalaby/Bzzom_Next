@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminApi } from "../../../_services/adminApi";
+import { menuItemsService } from "../../../_services/menuItems.service";
 import toast from "react-hot-toast";
 import {
   Plus,
@@ -21,7 +21,7 @@ export default function MenuItemsTable({
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, isActive }) =>
-      adminApi.menuItems.updateMenuItem(id, { is_active: isActive }),
+      menuItemsService.updateMenuItem(id, { is_active: isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-items"]);
       toast.success("تم تحديث الحالة بنجاح!");
@@ -29,7 +29,7 @@ export default function MenuItemsTable({
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => adminApi.menuItems.deleteMenuItem(id),
+    mutationFn: (id) => menuItemsService.deleteMenuItem(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-items"]);
       toast.success("تم حذف الصنف بنجاح!");

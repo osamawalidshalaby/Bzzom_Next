@@ -813,7 +813,7 @@ import {
   Plus,
   Minus,
   Trash2,
-  Package
+  Package,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -823,7 +823,8 @@ import Image from "next/image";
 import { customerApi } from "../_services/customerApi";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity, getTotalPrice, setCart } = useApp();
+  const { cart, removeFromCart, updateQuantity, getTotalPrice, setCart } =
+    useApp();
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -847,7 +848,7 @@ const Cart = () => {
       // حفظ السلة مؤقتاً
       localStorage.setItem("pendingCart", JSON.stringify(cart));
       localStorage.setItem("redirectAfterAuth", "/checkout");
-      
+
       toast.loading("جاري توجيهك لتسجيل الدخول...");
       setTimeout(() => {
         router.push("/auth/signin");
@@ -866,7 +867,8 @@ const Cart = () => {
         0.33: "تلت كيلو",
         0.5: "نص كيلو",
       };
-      const sizeLabel = sizeLabels[item.selectedSize] || `${item.selectedSize} `;
+      const sizeLabel =
+        sizeLabels[item.selectedSize] || `${item.selectedSize} `;
       return `${sizeLabel} × ${item.quantity}`;
     } else {
       return item.quantity === 1 ? "1 " : `${item.quantity} `;
@@ -885,8 +887,12 @@ const Cart = () => {
     if (newQuantity <= 0) {
       removeFromCart(item.id);
     } else {
-      const basePrice = parseFloat(item.price.toString().replace(/[^0-9.]/g, ""));
-      const calculatedPrice = Math.round(basePrice * item.selectedSize * newQuantity);
+      const basePrice = parseFloat(
+        item.price.toString().replace(/[^0-9.]/g, ""),
+      );
+      const calculatedPrice = Math.round(
+        basePrice * item.selectedSize * newQuantity,
+      );
 
       const updatedItem = {
         ...item,
@@ -894,10 +900,10 @@ const Cart = () => {
         calculatedPrice: calculatedPrice,
       };
 
-      setCart(prevCart =>
-        prevCart.map(cartItem =>
-          cartItem.id === item.id ? updatedItem : cartItem
-        )
+      setCart((prevCart) =>
+        prevCart.map((cartItem) =>
+          cartItem.id === item.id ? updatedItem : cartItem,
+        ),
       );
     }
   };
@@ -906,13 +912,18 @@ const Cart = () => {
     if (cart.length === 0) return "";
 
     let totalTime = 0;
-    cart.forEach(item => {
+    cart.forEach((item) => {
       let itemTime = 15;
-      if (item.category === "grill" || item.name.includes("شواية")) {
+      const nameIsString = typeof item.name === "string";
+      if (
+        item.category === "grill" ||
+        (nameIsString && item.name.includes("شواية"))
+      ) {
         itemTime = 25;
       }
-      if (item.quantity > 2) {
-        itemTime += 5 * (item.quantity - 2);
+      const qty = Number(item.quantity) || 0;
+      if (qty > 2) {
+        itemTime += 5 * (qty - 2);
       }
       totalTime += itemTime;
     });
@@ -954,7 +965,9 @@ const Cart = () => {
               <ArrowLeft size={20} />
               <span>العودة للقائمة</span>
             </Link>
-            <h1 className="text-xl font-bold text-[#C49A6C] text-center">سلة الطلبات</h1>
+            <h1 className="text-xl font-bold text-[#C49A6C] text-center">
+              سلة الطلبات
+            </h1>
             <div className="w-10"></div>
           </div>
 
@@ -962,7 +975,9 @@ const Cart = () => {
             <div className="text-center py-12">
               <ShoppingCart size={60} className="text-white/30 mx-auto mb-4" />
               <h2 className="text-lg text-white/60 mb-3">السلة فارغة</h2>
-              <p className="text-white/40 mb-6 text-sm">أضف بعض الأطباق من القائمة</p>
+              <p className="text-white/40 mb-6 text-sm">
+                أضف بعض الأطباق من القائمة
+              </p>
               <Link
                 href="/menu"
                 className="bg-[#C49A6C] text-black px-6 py-2 rounded-lg font-semibold hover:bg-[#B08A5C] transition-all text-sm inline-block"
@@ -1044,7 +1059,9 @@ const Cart = () => {
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-blue-400" />
                     <div>
-                      <p className="text-blue-300 font-medium text-sm">⏰ وقت التوصيل المتوقع</p>
+                      <p className="text-blue-300 font-medium text-sm">
+                        ⏰ وقت التوصيل المتوقع
+                      </p>
                       <p className="text-white/80 text-xs">
                         سيتم تسليم طلبك حوالي الساعة {estimatedTime}
                       </p>
@@ -1104,7 +1121,9 @@ const Cart = () => {
                     ) : (
                       <>
                         <CreditCard size={18} />
-                        {isUserLoggedIn ? "إتمام الطلب" : "سجل الدخول لإتمام الطلب"}
+                        {isUserLoggedIn
+                          ? "إتمام الطلب"
+                          : "سجل الدخول لإتمام الطلب"}
                       </>
                     )}
                   </motion.button>

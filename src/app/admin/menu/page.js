@@ -170,7 +170,6 @@
 //   );
 // }
 
-
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -180,8 +179,13 @@ import MenuItemsTable from "./_components/MenuItemsTable";
 import CategoryModal from "./_components/CategoryModal";
 import MenuItemModal from "./_components/MenuItemModal";
 import { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
-import { adminApi } from "../../_services/adminApi";
+import { authService } from "../../_services/auth.service";
+import {
+  menuItemsService,
+  menuCategoriesService,
+} from "../../_services/menuItems.service";
 
 export default function AdminMenuControl() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -195,13 +199,13 @@ export default function AdminMenuControl() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = await adminApi.auth.checkAuth();
+      const isAuth = await authService.checkAuth();
       if (!isAuth) {
         router.push("/admin/login");
         return;
       }
 
-      const role = adminApi.auth.getCurrentRole();
+      const role = authService.getCurrentRole();
       if (!role || !["admin", "chief"].includes(role)) {
         toast.error("غير مصرح لك بالوصول إلى هذه الصفحة");
         if (role === "cashier") {
@@ -226,7 +230,7 @@ export default function AdminMenuControl() {
     refetch: refetchCategories,
   } = useQuery({
     queryKey: ["menu-categories"],
-    queryFn: adminApi.menuCategories.getCategories,
+    queryFn: menuCategoriesService.getCategories,
     enabled: isAuthenticated,
   });
 
@@ -236,7 +240,7 @@ export default function AdminMenuControl() {
     refetch: refetchItems,
   } = useQuery({
     queryKey: ["menu-items"],
-    queryFn: adminApi.menuItems.getMenuItems,
+    queryFn: menuItemsService.getMenuItems,
     enabled: isAuthenticated,
   });
 

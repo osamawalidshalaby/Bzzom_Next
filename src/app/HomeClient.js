@@ -2,10 +2,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  CreditCard,
-  Clock,
-} from "lucide-react";
+import { CreditCard, Clock } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useApp } from "./layout-client";
 
@@ -20,6 +17,9 @@ import RestaurantGallery from "../app/_components/RestaurantGallery";
 import StatsSection from "../app/_components/StatsSection";
 import Footer from "../app/_components/Footer";
 import CategoriesSection from "../app/_components/CategoriesSection";
+import RamadanBanner from "../app/_components/RamadanBanner";
+import DiscountCard from "../app/_components/DiscountCard";
+import MenuItemsSection from "../app/_components/MenuItemsSection";
 
 // Data Hooks
 import { useFeaturedDishes, useOffers } from "../app/_hooks/useQueries";
@@ -27,12 +27,15 @@ import { useFeaturedDishes, useOffers } from "../app/_hooks/useQueries";
 // Hooks
 import { useCartSound } from "../app/_hooks/useCartSound";
 
-import {
-  restaurantPhotos,
-  paymentMethods,
-} from "../app/_data/homeData";
+import { restaurantPhotos, paymentMethods } from "../app/_data/homeData";
 
-export default function HomeClient({ slides, categories, featuredDishes, offers }) {
+export default function HomeClient({
+  slides,
+  categories,
+  featuredDishes,
+  offers,
+  menuItems,
+}) {
   const { addToCart } = useApp();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -71,7 +74,7 @@ export default function HomeClient({ slides, categories, featuredDishes, offers 
     const encodedMessage = encodeURIComponent(message);
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
-      "_blank"
+      "_blank",
     );
   };
 
@@ -147,6 +150,12 @@ export default function HomeClient({ slides, categories, featuredDishes, offers 
       />
 
       <div className="min-h-screen bg-black text-white overflow-x-hidden">
+        {/* Ramadan Banner */}
+        <RamadanBanner />
+
+        {/* Discount Card */}
+        <DiscountCard />
+
         {/* Hero Section - 50vh */}
         <HeroSection
           slides={slides}
@@ -159,7 +168,7 @@ export default function HomeClient({ slides, categories, featuredDishes, offers 
         <CategoriesSection categories={categories} />
 
         {/* Featured Dishes Section */}
-        <section className="py-12 md:py-20 px-4 bg-linear-to-b from-black to-zinc-900 w-full">
+        <section className="py-6 md:py-10 px-4 bg-linear-to-b from-black to-zinc-900 w-full relative">
           <div className="max-w-7xl mx-auto w-full">
             <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word">
               أطباقنا المميزة
@@ -179,13 +188,26 @@ export default function HomeClient({ slides, categories, featuredDishes, offers 
               ))}
             </HorizontalScrollContainer>
           </div>
+          {/* Gradient to next section */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 md:h-20 bg-gradient-to-b from-transparent to-zinc-900 pointer-events-none"></div>
         </section>
 
+        {/* Menu Items Section */}
+        <MenuItemsSection
+          menuItems={menuItems}
+          onItemClick={openItemDetails}
+          onAddToCart={handleAddToCart}
+        />
+
+        {/* Gradient divider between Menu and Offers */}
+        <div className="w-full h-16 md:h-20 bg-gradient-to-b from-transparent to-zinc-900 pointer-events-none"></div>
         {/* Special Offers Section */}
         <section
           id="special-offers"
-          className="py-4 md:py-8 px-4 bg-zinc-900 w-full"
+          className="py-8 md:py-10 px-4 bg-gradient-to-b from-zinc-900 via-zinc-900 to-black w-full relative"
         >
+          {/* Top gradient to blend from previous section */}
+          <div className="absolute top-0 left-0 right-0 h-16 md:h-20 bg-gradient-to-t from-transparent to-zinc-900 pointer-events-none"></div>
           <div className="max-w-7xl mx-auto w-full">
             <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center wrap-break-word">
               العروض الخاصة
@@ -205,13 +227,15 @@ export default function HomeClient({ slides, categories, featuredDishes, offers 
               ))}
             </HorizontalScrollContainer>
           </div>
+          {/* Gradient to next section */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 md:h-20 bg-gradient-to-b from-transparent to-zinc-900 pointer-events-none"></div>
         </section>
 
-        {/* Restaurant Photos Section */}
-        <RestaurantGallery photos={restaurantPhotos} />
+        {/* Restaurant Gallery Section */}
+        <RestaurantGallery />
 
         {/* Contact & Payment Methods Section */}
-        <section className="py-16 md:py-20 px-4 bg-black w-full">
+        <section className="py-8 md:py-12 px-4 bg-black w-full relative">
           <div className="max-w-7xl mx-auto w-full">
             <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-8 md:mb-12 text-center wrap-break-word">
               تواصل معنا

@@ -1,5 +1,3 @@
-
-
 // "use client";
 // import { useEffect, useState } from "react";
 // import { useRouter } from "next/navigation";
@@ -164,7 +162,6 @@
 //   );
 // }
 
-
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -173,8 +170,15 @@ import TabsNavigation from "./_components/TabsNavigation";
 import DataTable from "./_components/DataTable";
 import AddEditModal from "./_components/AddEditModal";
 import { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
-import { adminApi } from "../../_services/adminApi";
+import { authService } from "../../_services/auth.service";
+import {
+  homeSlidesService,
+  featuredDishesService,
+  offersService,
+  categoriesService,
+} from "../../_services/content.service";
 
 export default function AdminHomeControl() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -186,13 +190,13 @@ export default function AdminHomeControl() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = await adminApi.auth.checkAuth();
+      const isAuth = await authService.checkAuth();
       if (!isAuth) {
         router.push("/admin/login");
         return;
       }
 
-      const role = adminApi.auth.getCurrentRole();
+      const role = authService.getCurrentRole();
       if (!role || role !== "admin") {
         toast.error("غير مصرح لك بالوصول إلى هذه الصفحة");
         router.push("/admin/dashboard");
@@ -209,25 +213,25 @@ export default function AdminHomeControl() {
   // Fetch data using React Query
   const { data: slides = [], isLoading: slidesLoading } = useQuery({
     queryKey: ["home-slides"],
-    queryFn: adminApi.home.getSlides,
+    queryFn: homeSlidesService.getSlides,
     enabled: isAuthenticated,
   });
 
   const { data: featuredDishes = [], isLoading: dishesLoading } = useQuery({
     queryKey: ["featured-dishes"],
-    queryFn: adminApi.featuredDishes.getFeaturedDishes,
+    queryFn: featuredDishesService.getFeaturedDishes,
     enabled: isAuthenticated,
   });
 
   const { data: offers = [], isLoading: offersLoading } = useQuery({
     queryKey: ["offers"],
-    queryFn: adminApi.offers.getOffers,
+    queryFn: offersService.getOffers,
     enabled: isAuthenticated,
   });
 
   const { data: categories = [], isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
-    queryFn: adminApi.categories.getCategories,
+    queryFn: categoriesService.getCategories,
     enabled: isAuthenticated,
   });
 
@@ -259,7 +263,9 @@ export default function AdminHomeControl() {
   if (userRole !== "admin") {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center pt-16">
-        <div className="text-red-500 text-xl">غير مصرح لك بالوصول إلى هذه الصفحة</div>
+        <div className="text-red-500 text-xl">
+          غير مصرح لك بالوصول إلى هذه الصفحة
+        </div>
       </div>
     );
   }
@@ -270,7 +276,7 @@ export default function AdminHomeControl() {
         return {
           data: slides,
           loading: slidesLoading,
-          columns: ["العنوان", "الوصف", "الحالة"],
+          columns: ["العنوان", "الوصف", "ترتيب العرض", "الحالة"],
         };
       case "dishes":
         return {

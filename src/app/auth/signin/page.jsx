@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { ChefHat, ArrowRight, LogIn, Home } from "lucide-react";
 import { customerApi } from "../../_services/customerApi";
-import { authApi } from "../../_services/adminApi";
+import { authService } from "../../_services/auth.service";
 import Image from "next/image";
 
 export default function SignInPage() {
@@ -23,7 +23,7 @@ export default function SignInPage() {
     }
     
     // إذا كان مسجلاً كـ admin/cashier، توجيهه للوحة التحكم
-    if (authApi.isAuthenticated()) {
+    if (authService.isAuthenticated()) {
       router.push("/admin/dashboard");
     }
   }, [router, redirectTo]);

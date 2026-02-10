@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminApi } from "../../../_services/adminApi";
+import { menuCategoriesService } from "../../../_services/menuItems.service";
 import toast from "react-hot-toast";
 import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 
@@ -8,7 +8,7 @@ export default function CategoriesTable({ data, isLoading, onAddNew, onEdit }) {
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, isActive }) =>
-      adminApi.menuCategories.updateCategory(id, { is_active: isActive }),
+      menuCategoriesService.updateCategory(id, { is_active: isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-categories"]);
       toast.success("تم تحديث الحالة بنجاح!");
@@ -16,7 +16,7 @@ export default function CategoriesTable({ data, isLoading, onAddNew, onEdit }) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => adminApi.menuCategories.deleteCategory(id),
+    mutationFn: (id) => menuCategoriesService.deleteCategory(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-categories"]);
       toast.success("تم حذف الفئة بنجاح!");
@@ -34,7 +34,7 @@ export default function CategoriesTable({ data, isLoading, onAddNew, onEdit }) {
   const deleteCategory = (id) => {
     if (
       !confirm(
-        "هل أنت متأكد من حذف هذه الفئة؟ سيتم حذف جميع الأصناف المرتبطة بها."
+        "هل أنت متأكد من حذف هذه الفئة؟ سيتم حذف جميع الأصناف المرتبطة بها.",
       )
     )
       return;

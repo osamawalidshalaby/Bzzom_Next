@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -27,6 +26,7 @@ import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "../../_services/supabase";
 import { customerApi } from "../../_services/customerApi";
+import { realtimeService } from "../../_services/realtime.service";
 
 export default function OrderConfirmationPage() {
   const { id } = useParams();
@@ -37,6 +37,7 @@ export default function OrderConfirmationPage() {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
   const [paymentPolling, setPaymentPolling] = useState(null);
+  const [ordersChannel, setOrdersChannel] = useState(null);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -94,6 +95,52 @@ export default function OrderConfirmationPage() {
     };
   }, [id]);
 
+  // تنظيف قناة realtime
+  useEffect(() => {
+    return () => {
+      if (ordersChannel) {
+        supabase.removeChannel(ordersChannel);
+      }
+    };
+  }, []);
+
+  // إعداد الاشتراك في تحديثات الطلب الفورية
+  useEffect(() => {
+    if (!id) return;
+
+    console.log("📡 إعداد الاشتراك في تحديثات الطلب الفورية:", id);
+
+    // الاستماع للتحديثات على هذا الطلب المحدد
+    const channel = supabase
+      .channel(`order-${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `id=eq.${id}`,
+        },
+        (payload) => {
+          console.log("🔄 تحديث الطلب المستقبل:", payload);
+          const updatedOrder = payload.new;
+          setOrder(updatedOrder);
+
+          // تحديث حالة الدفع إذا تغيرت
+          if (updatedOrder.payment_status) {
+            setPaymentStatus(updatedOrder.payment_status);
+          }
+        },
+      )
+      .subscribe();
+
+    setOrdersChannel(channel);
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id]);
+
   // تتبع حالة الدفع لطلبات Paymob
   const startPaymentPolling = (orderId) => {
     const interval = setInterval(async () => {
@@ -148,7 +195,7 @@ export default function OrderConfirmationPage() {
       const { data: updatedOrder, error: fetchError } = await supabase
         .from("orders")
         .select(
-          "payment_status, paymob_order_id, payment_provider, payment_metadata"
+          "payment_status, paymob_order_id, payment_provider, payment_metadata",
         )
         .eq("id", id)
         .single();
@@ -396,7 +443,7 @@ export default function OrderConfirmationPage() {
   const statusConfig = getStatusConfig(order.status);
   const StatusIcon = statusConfig.icon;
   const paymentStatusConfig = getPaymentStatusConfig(
-    paymentStatus || order.payment_status
+    paymentStatus || order.payment_status,
   );
   const PaymentStatusIcon = paymentStatusConfig.icon;
 
@@ -549,7 +596,8 @@ export default function OrderConfirmationPage() {
                       <li>• قد يستغرق تأكيد الدفع حتى 10 دقائق</li>
                       <li>• سيتم تحديث حالة الطلب تلقائياً عند اكتمال الدفع</li>
                       <li>
-                        • يمكنك استخدام زر &quot;تحديث حالة الدفع&quot; للتحقق يدوياً
+                        • يمكنك استخدام زر &quot;تحديث حالة الدفع&quot; للتحقق
+                        يدوياً
                       </li>
                     </ul>
                   </div>
@@ -736,10 +784,10 @@ export default function OrderConfirmationPage() {
                       paymentStatus === "paid"
                         ? "bg-green-500"
                         : paymentStatus === "failed"
-                        ? "bg-red-500"
-                        : paymentStatus === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-gray-600"
+                          ? "bg-red-500"
+                          : paymentStatus === "pending"
+                            ? "bg-yellow-500"
+                            : "bg-gray-600"
                     }`}
                   >
                     <CircleDollarSign className="w-6 h-6 text-white" />
@@ -752,10 +800,10 @@ export default function OrderConfirmationPage() {
                     {paymentStatus === "paid"
                       ? "تم الدفع بنجاح عبر Paymob"
                       : paymentStatus === "pending"
-                      ? "في انتظار تأكيد الدفع عبر Paymob"
-                      : paymentStatus === "failed"
-                      ? "فشل عملية الدفع عبر Paymob"
-                      : "حالة الدفع غير معروفة"}
+                        ? "في انتظار تأكيد الدفع عبر Paymob"
+                        : paymentStatus === "failed"
+                          ? "فشل عملية الدفع عبر Paymob"
+                          : "حالة الدفع غير معروفة"}
                   </p>
                   {order.paymob_order_id && (
                     <p className="text-white/40 text-sm mt-1">
@@ -774,10 +822,10 @@ export default function OrderConfirmationPage() {
                     ["preparing", "ready", "completed"].includes(order.status)
                       ? "bg-green-500"
                       : order.status === "pending"
-                      ? "bg-yellow-500"
-                      : order.status === "cancelled"
-                      ? "bg-red-500"
-                      : "bg-gray-600"
+                        ? "bg-yellow-500"
+                        : order.status === "cancelled"
+                          ? "bg-red-500"
+                          : "bg-gray-600"
                   }`}
                 >
                   <ChefHat className="w-6 h-6 text-white" />
@@ -790,12 +838,12 @@ export default function OrderConfirmationPage() {
                   {order.status === "pending"
                     ? "في انتظار البدء في التجهيز"
                     : order.status === "preparing"
-                    ? "جاري تجهيز طلبك حالياً"
-                    : order.status === "ready" || order.status === "completed"
-                    ? "تم تجهيز طلبك بنجاح"
-                    : order.status === "cancelled"
-                    ? "تم إلغاء التجهيز"
-                    : "قيد الانتظار"}
+                      ? "جاري تجهيز طلبك حالياً"
+                      : order.status === "ready" || order.status === "completed"
+                        ? "تم تجهيز طلبك بنجاح"
+                        : order.status === "cancelled"
+                          ? "تم إلغاء التجهيز"
+                          : "قيد الانتظار"}
                 </p>
                 {order.started_preparing_at && (
                   <p className="text-white/40 text-sm mt-1">
@@ -818,8 +866,8 @@ export default function OrderConfirmationPage() {
                     ["ready", "completed"].includes(order.status)
                       ? "bg-green-500"
                       : order.status === "cancelled"
-                      ? "bg-red-500"
-                      : "bg-gray-600"
+                        ? "bg-red-500"
+                        : "bg-gray-600"
                   }`}
                 >
                   <ShoppingBag className="w-6 h-6 text-white" />
@@ -831,10 +879,10 @@ export default function OrderConfirmationPage() {
                   {order.status === "ready"
                     ? "طلبك جاهز للتسليم - يمكنك التواصل مع المطعم"
                     : order.status === "completed"
-                    ? "تم تسليم طلبك بنجاح - شكراً لاختياركم بزوم"
-                    : order.status === "cancelled"
-                    ? "تم إلغاء الطلب"
-                    : "في انتظار انتهاء التجهيز"}
+                      ? "تم تسليم طلبك بنجاح - شكراً لاختياركم بزوم"
+                      : order.status === "cancelled"
+                        ? "تم إلغاء الطلب"
+                        : "في انتظار انتهاء التجهيز"}
                 </p>
               </div>
             </div>

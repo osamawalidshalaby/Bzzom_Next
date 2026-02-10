@@ -781,7 +781,7 @@ import { usePathname } from 'next/navigation';
 import { useApp } from '../layout-client';
 import Image from 'next/image';
 import { customerApi } from '../_services/customerApi';
-import { authApi } from '../_services/adminApi';
+import { authService } from '../_services/auth.service';
 import { supabase } from '../_services/supabase';
 
 const CUSTOMER_STORAGE_KEY = "bazzom_customer";
@@ -1012,7 +1012,7 @@ const Navigation = () => {
 
   const handleAdminLogout = async () => {
     try {
-      await authApi.logout();
+      await authService.logout();
       await updateUserStatus();
       setAccountMenuOpen(false);
       setMobileMenuOpen(false);

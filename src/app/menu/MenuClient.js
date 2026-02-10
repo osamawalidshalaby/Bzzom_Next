@@ -209,15 +209,18 @@
 
 // export default MenuClient;
 
-
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useCartSound } from "../_hooks/useCartSound";
 import toast, { Toaster } from "react-hot-toast";
 import { useApp } from "../layout-client";
-import { adminApi } from "../_services/adminApi";
+
 import { useQuery } from "@tanstack/react-query";
+import {
+  menuItemsService,
+  menuCategoriesService,
+} from "../_services/menuItems.service";
 import { useSearchParams } from "next/navigation";
 
 // Components
@@ -249,7 +252,7 @@ const MenuClient = () => {
   // Get categories
   const { data: categories = [], isLoading: categoriesLoading } = useQuery({
     queryKey: ["menu_categories"],
-    queryFn: adminApi.menuCategories.getCategories,
+    queryFn: menuCategoriesService.getCategories,
   });
 
   // Custom hook for debouncing
@@ -281,11 +284,10 @@ const MenuClient = () => {
     queryFn: async () => {
       // إذا كان هناك بحث، نبحث في كل الأقسام بغض النظر عن الفئة المحددة
       if (debouncedSearch && debouncedSearch.trim() !== "") {
-
         // استخدام دالة البحث الخاصة
-        const searchResults = await adminApi.menuItems.searchAllItems(
+        const searchResults = await menuItemsService.searchAllItems(
           debouncedSearch,
-          50
+          50,
         );
 
         // إذا كان هناك فئة محددة غير "all"، نفلتر النتائج حسب الفئة
@@ -298,7 +300,7 @@ const MenuClient = () => {
 
           if (category) {
             return searchResults.filter(
-              (item) => item.category_id === category.id
+              (item) => item.category_id === category.id,
             );
           }
         }
@@ -307,10 +309,10 @@ const MenuClient = () => {
       }
 
       // إذا لم يكن هناك بحث، نستخدم الفلترة العادية
-      return await adminApi.menuItems.getFilteredMenuItems(
+      return await menuItemsService.getFilteredMenuItems(
         selectedCategory,
         "", // لا بحث
-        20
+        20,
       );
     },
     enabled: !categoriesLoading, // انتظار تحميل الفئات أولاً
@@ -329,17 +331,30 @@ const MenuClient = () => {
   };
 
   const handleAddToCart = (dish) => {
+    const qty = dish.quantity || 1;
+    const base = (() => {
+      try {
+        return parseFloat(dish.price?.toString()?.replace(/[^0-9.]/g, "")) || 0;
+      } catch (e) {
+        return Number(dish.price) || 0;
+      }
+    })();
+
+    const price = dish.calculatedPrice ?? Math.round(base * qty);
+
     addToCart({
       id: dish.id,
       name: dish.name,
       nameEn: dish.name_en || "",
-      price: dish.price,
+      price: price,
       desc: dish.description || "",
       image: dish.image || "",
-      quantity: 1,
+      quantity: qty,
+      selectedSize: dish.selectedSize || null,
+      basePrice: dish.basePrice || base,
     });
 
-    toast.success(`تم إضافة ${dish.name} إلى السلة! 🛒`, {
+    toast.success(`تم إضافة ${dish.name} ×${qty} إلى السلة! 🛒`, {
       position: "bottom-left",
       style: {
         background: "#1f2937",
@@ -367,7 +382,6 @@ const MenuClient = () => {
   ];
 
   const isLoading = categoriesLoading || itemsLoading;
-
 
   return (
     <>

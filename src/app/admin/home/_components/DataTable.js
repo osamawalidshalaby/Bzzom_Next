@@ -268,10 +268,13 @@
 //   );
 // }
 
-
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminApi } from "../../../_services/adminApi";
+import {
+  homeSlidesService,
+  featuredDishesService,
+  offersService,
+  categoriesService,
+} from "../../../_services/content.service";
 import toast from "react-hot-toast";
 import {
   Plus,
@@ -280,6 +283,8 @@ import {
   Eye,
   EyeOff,
   Image as ImageIcon,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 
 export default function DataTable({
@@ -295,7 +300,7 @@ export default function DataTable({
   // Toggle mutations
   const toggleSlideMutation = useMutation({
     mutationFn: ({ id, isActive }) =>
-      adminApi.home.updateSlide(id, { is_active: isActive }),
+      homeSlidesService.updateSlide(id, { is_active: isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries(["home-slides"]);
       toast.success("تم تحديث الحالة بنجاح!");
@@ -304,7 +309,7 @@ export default function DataTable({
 
   const toggleDishMutation = useMutation({
     mutationFn: ({ id, isActive }) =>
-      adminApi.featuredDishes.updateFeaturedDish(id, { is_active: isActive }),
+      featuredDishesService.updateFeaturedDish(id, { is_active: isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries(["featured-dishes"]);
       toast.success("تم تحديث الحالة بنجاح!");
@@ -313,7 +318,7 @@ export default function DataTable({
 
   const toggleOfferMutation = useMutation({
     mutationFn: ({ id, isActive }) =>
-      adminApi.offers.updateOffer(id, { is_active: isActive }),
+      offersService.updateOffer(id, { is_active: isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries(["offers"]);
       toast.success("تم تحديث الحالة بنجاح!");
@@ -322,7 +327,7 @@ export default function DataTable({
 
   const toggleCategoryMutation = useMutation({
     mutationFn: ({ id, isActive }) =>
-      adminApi.categories.updateCategory(id, { is_active: isActive }),
+      categoriesService.updateCategory(id, { is_active: isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries(["categories"]);
       toast.success("تم تحديث الحالة بنجاح!");
@@ -331,7 +336,7 @@ export default function DataTable({
 
   // Delete mutations
   const deleteSlideMutation = useMutation({
-    mutationFn: (id) => adminApi.home.deleteSlide(id),
+    mutationFn: (id) => homeSlidesService.deleteSlide(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["home-slides"]);
       toast.success("تم حذف الشريحة بنجاح!");
@@ -339,7 +344,7 @@ export default function DataTable({
   });
 
   const deleteDishMutation = useMutation({
-    mutationFn: (id) => adminApi.featuredDishes.deleteFeaturedDish(id),
+    mutationFn: (id) => featuredDishesService.deleteFeaturedDish(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["featured-dishes"]);
       toast.success("تم حذف الطبق بنجاح!");
@@ -347,7 +352,7 @@ export default function DataTable({
   });
 
   const deleteOfferMutation = useMutation({
-    mutationFn: (id) => adminApi.offers.deleteOffer(id),
+    mutationFn: (id) => offersService.deleteOffer(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["offers"]);
       toast.success("تم حذف العرض بنجاح!");
@@ -355,10 +360,22 @@ export default function DataTable({
   });
 
   const deleteCategoryMutation = useMutation({
-    mutationFn: (id) => adminApi.categories.deleteCategory(id),
+    mutationFn: (id) => categoriesService.deleteCategory(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["categories"]);
       toast.success("تم حذف التصنيف بنجاح!");
+    },
+  });
+
+  const updateSortOrderMutation = useMutation({
+    mutationFn: ({ id, newSortOrder }) =>
+      homeSlidesService.updateSlide(id, { sort_order: newSortOrder }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["home-slides"]);
+      toast.success("تم تحديث الترتيب!");
+    },
+    onError: (error) => {
+      toast.error("فشل تحديث الترتيب");
     },
   });
 
@@ -403,6 +420,14 @@ export default function DataTable({
     }
   };
 
+  // Function to update sort order for slides
+  const handleSortOrderChange = (item, direction) => {
+    const currentOrder = item.sort_order || 0;
+    const newOrder =
+      direction === "up" ? currentOrder + 1 : Math.max(0, currentOrder - 1);
+    updateSortOrderMutation.mutate({ id: item.id, newSortOrder: newOrder });
+  };
+
   const getTableTitle = () => {
     switch (type) {
       case "slides":
@@ -432,6 +457,14 @@ export default function DataTable({
         return item.name_ar;
       case "الاسم الإنجليزي":
         return item.name_en;
+      case "ترتيب العرض":
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-[#C49A6C]">
+              {item.sort_order || 0}
+            </span>
+          </div>
+        );
       case "الحالة":
         return (
           <span
@@ -461,7 +494,8 @@ export default function DataTable({
     deleteSlideMutation.isPending ||
     deleteDishMutation.isPending ||
     deleteOfferMutation.isPending ||
-    deleteCategoryMutation.isPending;
+    deleteCategoryMutation.isPending ||
+    updateSortOrderMutation.isPending;
 
   return (
     <div className="bg-zinc-900 rounded-xl border border-[#C49A6C]/20 overflow-hidden">
@@ -533,7 +567,27 @@ export default function DataTable({
                     )}
                   </td>
                   <td className="px-4 sm:px-6 py-4">
-                    <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                      {type === "slides" && (
+                        <>
+                          <button
+                            onClick={() => handleSortOrderChange(item, "up")}
+                            disabled={isMutationPending}
+                            className="p-1 rounded text-purple-400 hover:bg-purple-500/20 disabled:opacity-50"
+                            title="زيادة الترتيب"
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleSortOrderChange(item, "down")}
+                            disabled={isMutationPending}
+                            className="p-1 rounded text-purple-400 hover:bg-purple-500/20 disabled:opacity-50"
+                            title="تقليل الترتيب"
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
                       <button
                         onClick={() => toggleActive(item.id)}
                         disabled={isMutationPending}

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { adminApi } from "../_services/adminApi";
+import { authService } from "../_services/auth.service";
 import toast from "react-hot-toast";
 
 export default function AdminLayout({ children }) {
@@ -11,14 +11,14 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const isAuth = await adminApi.auth.checkAuth();
+        const isAuth = await authService.checkAuth();
 
         if (!isAuth) {
           router.push("/admin/login");
           return;
         }
 
-        const userRole = adminApi.auth.getCurrentRole();
+        const userRole = authService.getCurrentRole();
         if (!userRole) {
           toast.error("لم يتم العثور على صلاحيات المستخدم");
           router.push("/admin/login");

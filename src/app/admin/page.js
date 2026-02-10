@@ -1,4 +1,3 @@
-
 // "use client";
 // import { useEffect, useState } from "react";
 // import { useRouter } from "next/navigation";
@@ -63,7 +62,6 @@
 //   }
 
 //   const getMenuItems = () => {
-    
 
 //     const adminItems = [
 //       {
@@ -284,7 +282,8 @@ import {
   DollarSign,
   Clock,
 } from "lucide-react";
-import { adminApi } from "../_services/adminApi";
+import { authService } from "../_services/auth.service";
+import { statsService } from "../_services/stats.service";
 import toast from "react-hot-toast";
 
 export default function AdminDashboard() {
@@ -300,13 +299,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = await adminApi.auth.checkAuth();
+      const isAuth = await authService.checkAuth();
       if (!isAuth) {
         router.push("/admin/login");
         return;
       }
 
-      const role = adminApi.auth.getCurrentRole();
+      const role = authService.getCurrentRole();
       if (!role) {
         toast.error("لم يتم العثور على صلاحيات المستخدم");
         router.push("/admin/login");
@@ -325,7 +324,7 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const statsData = await adminApi.stats.getDashboardStats();
+      const statsData = await statsService.getDashboardStats();
       setStats(statsData);
     } catch (error) {
       console.error("Error loading stats:", error);
@@ -334,7 +333,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await adminApi.auth.logout();
+      await authService.logout();
       router.push("/admin/login");
     } catch (error) {
       toast.error("حدث خطأ أثناء تسجيل الخروج");
@@ -486,9 +485,6 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        
-        
-
         {/* Stats Cards - للمدير فقط */}
         {userRole === "admin" && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

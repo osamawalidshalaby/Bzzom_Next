@@ -4,8 +4,6 @@ import supabase from "./_services/supabase";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-
-
 export const metadata = {
   title: "مطعم بزوم | Bazzom Restaurant",
   description:
@@ -13,7 +11,7 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const { data: slides, error : slideError } = await supabase
+  const { data: slides, error: slideError } = await supabase
     .from("home_slides")
     .select("*")
     .eq("is_active", true)
@@ -37,12 +35,18 @@ export default async function Home() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
+  const { data: menuItems, error: menuItemsError } = await supabase
+    .from("menu_items")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .limit(6);
+
   if (slideError) console.error(slideError);
   if (categoriesError) console.error(categoriesError);
   if (featuredDishesError) console.error(featuredDishesError);
   if (offersError) console.error(offersError);
-
-
+  if (menuItemsError) console.error(menuItemsError);
 
   return (
     <HomeClient
@@ -50,9 +54,7 @@ export default async function Home() {
       categories={categories}
       featuredDishes={featuredDishes}
       offers={offers}
+      menuItems={menuItems}
     />
   );
 }
-
-
-

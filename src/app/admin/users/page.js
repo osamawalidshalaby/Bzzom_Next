@@ -588,11 +588,11 @@
 //   );
 // }
 
-
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { adminApi } from "../../_services/adminApi";
+import { authService } from "../../_services/auth.service";
+import { adminService } from "../../_services/admin.service";
 import toast, { Toaster } from "react-hot-toast";
 import {
   Plus,
@@ -631,13 +631,13 @@ export default function UsersManagement() {
 
   const checkAuthAndLoadUsers = async () => {
     try {
-      const isAuth = await adminApi.auth.checkAuth();
+      const isAuth = await authService.checkAuth();
       if (!isAuth) {
         router.push("/admin/login");
         return;
       }
 
-      const role = adminApi.auth.getCurrentRole();
+      const role = authService.getCurrentRole();
       if (!role || role !== "admin") {
         toast.error("غير مصرح لك بالوصول إلى هذه الصفحة");
         if (role === "chief") {
@@ -662,7 +662,7 @@ export default function UsersManagement() {
 
   const loadUsers = async () => {
     try {
-      const usersList = await adminApi.auth.getAllUsers();
+      const usersList = await adminService.getAllUsers();
       setUsers(usersList);
     } catch (error) {
       console.error("Load users error:", error);
@@ -674,14 +674,14 @@ export default function UsersManagement() {
     e.preventDefault();
     try {
       // التحقق من أن المستخدم الحالي مدير
-      const currentRole = adminApi.auth.getCurrentRole();
+      const currentRole = authService.getCurrentRole();
       if (currentRole !== "admin") {
         toast.error("غير مصرح لك بإنشاء حسابات جديدة");
         return;
       }
 
-      // استخدام دالة createUser الموجودة في authApi
-      await adminApi.auth.createUser({
+      // استخدام دالة createUser الموجودة في adminService
+      await adminService.createUser({
         email: formData.email,
         password: formData.password,
         name: formData.name,
@@ -723,7 +723,7 @@ export default function UsersManagement() {
         return;
       }
 
-      await adminApi.auth.deleteUser(userId);
+      await adminService.deleteUser(userId);
       toast.success("تم حذف المستخدم بنجاح");
       await loadUsers();
     } catch (error) {
@@ -734,8 +734,8 @@ export default function UsersManagement() {
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
     try {
-      // استخدام دالة updateUserStatus من authApi
-      await adminApi.auth.updateUserStatus(userId, !currentStatus);
+      // استخدام دالة updateUserStatus من adminService
+      await adminService.updateUserStatus(userId, !currentStatus);
 
       toast.success(`تم ${!currentStatus ? "تفعيل" : "إيقاف"} الحساب بنجاح`);
       await loadUsers();
@@ -800,7 +800,7 @@ export default function UsersManagement() {
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (user.name &&
         user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      getRoleArabic(user.role).includes(searchTerm)
+      getRoleArabic(user.role).includes(searchTerm),
   );
 
   if (isLoading) {
@@ -975,7 +975,7 @@ export default function UsersManagement() {
                         <div className="flex items-center gap-2">
                           <span
                             className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
-                              user.role
+                              user.role,
                             )}`}
                           >
                             {getRoleArabic(user.role)}

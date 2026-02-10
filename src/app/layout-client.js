@@ -37,7 +37,7 @@ export default function ClientLayout({ children }) {
             refetchOnWindowFocus: false,
           },
         },
-      })
+      }),
   );
   const [cart, setCart] = useState([]);
 
@@ -51,7 +51,7 @@ export default function ClientLayout({ children }) {
         const existingItemWithSameSize = prevCart.find(
           (cartItem) =>
             cartItem.id === item.id &&
-            cartItem.selectedSize === item.selectedSize
+            cartItem.selectedSize === item.selectedSize,
         );
 
         if (existingItemWithSameSize) {
@@ -65,14 +65,14 @@ export default function ClientLayout({ children }) {
                   calculatedPrice:
                     (cartItem.calculatedPrice ||
                       parseFloat(
-                        cartItem.price.toString().replace(/[^0-9.]/g, "")
+                        cartItem.price.toString().replace(/[^0-9.]/g, ""),
                       )) +
                     (item.calculatedPrice ||
                       parseFloat(
-                        item.price.toString().replace(/[^0-9.]/g, "")
+                        item.price.toString().replace(/[^0-9.]/g, ""),
                       ) * (item.quantity || 1)),
                 }
-              : cartItem
+              : cartItem,
           );
         } else {
           // إضافة عنصر جديد بحجم مختلف
@@ -100,11 +100,11 @@ export default function ClientLayout({ children }) {
                     ? cartItem.calculatedPrice +
                       (item.calculatedPrice ||
                         parseFloat(
-                          item.price.toString().replace(/[^0-9.]/g, "")
+                          item.price.toString().replace(/[^0-9.]/g, ""),
                         ) * (item.quantity || 1))
                     : null,
                 }
-              : cartItem
+              : cartItem,
           );
         } else {
           return [
@@ -130,15 +130,15 @@ export default function ClientLayout({ children }) {
     } else {
       setCart((prevCart) =>
         prevCart.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        )
+          item.id === itemId ? { ...item, quantity: newQuantity } : item,
+        ),
       );
     }
   };
 
   const getTotalPrice = () => {
     return cart.reduce((total, item) => {
-      const price = parseInt(item.price.replace(/[^0-9]/g, ""));
+      const price = parseInt(item.price.toString().replace(/[^0-9]/g, ""));
       return total + price * item.quantity;
     }, 0);
   };

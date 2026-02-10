@@ -16,8 +16,10 @@ import {
   TrendingUp,
   User,
 } from "lucide-react";
-import { adminApi } from "../_services/adminApi";
 import { queryKeys, setupRealtime } from "../_services/react-query";
+import { authService } from "../_services/auth.service";
+import { ordersService } from "../_services/orders.service";
+import { supabase } from "../_services/supabase";
 
 export default function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,13 +29,13 @@ export default function OrdersPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = await adminApi.auth.checkAuth();
+      const isAuth = await authService.checkAuth();
       if (!isAuth) {
         router.push("/admin/login");
         return;
       }
 
-      const userRole = adminApi.auth.getCurrentRole();
+      const userRole = authService.getCurrentRole();
       if (!["cashier", "admin"].includes(userRole)) {
         toast.error("غير مصرح لك بالوصول إلى هذه الصفحة");
         if (userRole === "chief") {
@@ -50,7 +52,7 @@ export default function OrdersPage() {
   // إعداد Supabase Realtime
   useEffect(() => {
     const cleanup = setupRealtime(
-      adminApi.supabase,
+      supabase,
       (newOrder) => {
         toast.success(`طلب جديد من ${newOrder.customer_name}`);
         queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
@@ -59,7 +61,7 @@ export default function OrdersPage() {
         if (updatedOrder.status === "ready") {
           toast.success(`الطلب #${updatedOrder.id.slice(0, 8)} جاهز للتسليم`);
         }
-      }
+      },
     );
 
     return cleanup;
@@ -74,7 +76,7 @@ export default function OrdersPage() {
   } = useQuery({
     queryKey: queryKeys.orders.list({ status: statusFilter }),
     queryFn: () =>
-      adminApi.orders.getOrders({
+      ordersService.getOrders({
         status: statusFilter !== "all" ? statusFilter : undefined,
       }),
   });
@@ -82,13 +84,13 @@ export default function OrdersPage() {
   // استعلام الإحصائيات
   const { data: stats } = useQuery({
     queryKey: queryKeys.orders.stats(),
-    queryFn: () => adminApi.orders.getOrderStats("today"),
+    queryFn: () => ordersService.getOrderStats("today"),
   });
 
   // طلب تحديث حالة الطلب
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ orderId, newStatus }) =>
-      adminApi.orders.updateOrderStatus(orderId, newStatus),
+      ordersService.updateOrderStatus(orderId, newStatus),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.stats() });
@@ -360,7 +362,7 @@ export default function OrdersPage() {
                       <td className="p-4 text-white/60">
                         {order.created_at
                           ? new Date(order.created_at).toLocaleDateString(
-                              "ar-EG"
+                              "ar-EG",
                             )
                           : "N/A"}
                       </td>

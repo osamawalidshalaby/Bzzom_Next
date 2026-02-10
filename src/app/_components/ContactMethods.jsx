@@ -41,7 +41,7 @@ const ContactMethods = ({
   ];
 
   return (
-    <div className="space-y-3 md:space-y-4">
+    <div id='contact' className="space-y-3 md:space-y-4">
       {contactMethods.map((contact, idx) => (
         <motion.div
           key={idx}

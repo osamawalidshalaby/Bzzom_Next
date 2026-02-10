@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminApi } from "../../../_services/adminApi";
+import { menuItemsService } from "../../../_services/menuItems.service";
 import toast from "react-hot-toast";
 import { X, Image as ImageIcon } from "lucide-react";
 
@@ -30,7 +30,7 @@ export default function MenuItemModal({ editingItem, categories, onClose }) {
   };
 
   const createMutation = useMutation({
-    mutationFn: (data) => adminApi.menuItems.createMenuItem(data, imageFile),
+    mutationFn: (data) => menuItemsService.createMenuItem(data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-items"]);
       toast.success("تم إضافة الصنف بنجاح!");
@@ -40,7 +40,7 @@ export default function MenuItemModal({ editingItem, categories, onClose }) {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) =>
-      adminApi.menuItems.updateMenuItem(id, data, imageFile),
+      menuItemsService.updateMenuItem(id, data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-items"]);
       toast.success("تم تحديث الصنف بنجاح!");

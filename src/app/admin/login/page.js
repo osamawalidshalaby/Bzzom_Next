@@ -145,15 +145,11 @@
 //             </button>
 //           </form>
 
-          
-         
 //         </div>
 //       </div>
 //     </div>
 //   );
 // }
-
-
 
 "use client";
 import { useState } from "react";
@@ -170,7 +166,7 @@ import {
   Shield,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
-import { adminApi } from "../../_services/adminApi";
+import { authService } from "../../_services/auth.service";
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -186,7 +182,7 @@ export default function AdminLogin() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const result = await adminApi.auth.login(data.email, data.password);
+      const result = await authService.login(data.email, data.password);
 
       if (result.user) {
         const role = result.profile?.role || "cashier";
@@ -338,8 +334,6 @@ export default function AdminLogin() {
                 </>
               )}
             </button>
-
-
           </form>
         </div>
       </div>

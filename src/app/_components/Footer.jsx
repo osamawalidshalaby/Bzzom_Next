@@ -52,7 +52,7 @@ const Footer = () => {
               <li><Link href="/" className="text-white/60 hover:text-[#C49A6C] transition-all">الرئيسية</Link></li>
               <li><Link href="/menu" className="text-white/60 hover:text-[#C49A6C] transition-all">قائمة الطعام</Link></li>
               <li><Link href="/about" className="text-white/60 hover:text-[#C49A6C] transition-all">عن المطعم</Link></li>
-              <li><Link href="/contact" className="text-white/60 hover:text-[#C49A6C] transition-all">اتصل بنا</Link></li>
+              <li><Link href="#contact" className="text-white/60 hover:text-[#C49A6C] transition-all">اتصل بنا</Link></li>
             </ul>
           </div>
 

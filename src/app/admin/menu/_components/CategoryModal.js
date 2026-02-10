@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminApi } from "../../../_services/adminApi";
+import { menuCategoriesService } from "../../../_services/menuItems.service";
 import toast from "react-hot-toast";
 import { X } from "lucide-react";
 
@@ -18,7 +18,7 @@ export default function CategoryModal({ editingCategory, onClose }) {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data) => adminApi.menuCategories.createCategory(data),
+    mutationFn: (data) => menuCategoriesService.createCategory(data),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-categories"]);
       toast.success("تم إضافة الفئة بنجاح!");
@@ -28,7 +28,7 @@ export default function CategoryModal({ editingCategory, onClose }) {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) =>
-      adminApi.menuCategories.updateCategory(id, data),
+      menuCategoriesService.updateCategory(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["menu-categories"]);
       toast.success("تم تحديث الفئة بنجاح!");

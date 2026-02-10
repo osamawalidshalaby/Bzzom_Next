@@ -44,14 +44,7 @@ export const setupRealtime = (supabase, onNewOrder, onOrderUpdate) => {
       (payload) => {
         console.log("New order received:", payload);
         if (onNewOrder) onNewOrder(payload.new);
-
-        // تشغيل صوت التنبيه
-        if (typeof window !== "undefined") {
-          const audio = new Audio("/sounds/notification.mp3");
-          audio.volume = 0.3;
-          audio.play().catch(console.error);
-        }
-      }
+      },
     )
     .on(
       "postgres_changes",
@@ -66,7 +59,7 @@ export const setupRealtime = (supabase, onNewOrder, onOrderUpdate) => {
 
         // إلغاء صلاحية الاستعلامات
         queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
-      }
+      },
     )
     .subscribe();
 

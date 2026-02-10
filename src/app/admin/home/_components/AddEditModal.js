@@ -1,4 +1,3 @@
-
 // import { useState } from "react";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 // import { adminApi } from "../../../_services/adminApi";
@@ -167,12 +166,12 @@
 //   const getModalTitle = () => {
 //     const action = editingItem ? "تعديل" : "إضافة";
 //     const itemType =
-//       type === "slides" 
-//         ? "شريحة" 
-//         : type === "dishes" 
-//         ? "طبق مميز" 
-//         : type === "offers" 
-//         ? "عرض" 
+//       type === "slides"
+//         ? "شريحة"
+//         : type === "dishes"
+//         ? "طبق مميز"
+//         : type === "offers"
+//         ? "عرض"
 //         : "تصنيف";
 
 //     return `${action} ${itemType}`;
@@ -537,18 +536,26 @@
 //   );
 // }
 
-
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminApi } from "../../../_services/adminApi";
+import {
+  homeSlidesService,
+  featuredDishesService,
+  offersService,
+  categoriesService,
+} from "../../../_services/content.service";
 import toast from "react-hot-toast";
 import { X, Image as ImageIcon } from "lucide-react";
 
 export default function AddEditModal({ type, editingItem, onClose }) {
   // Initialize form data based on type
-  const [formData, setFormData] = useState(() => getInitialFormData(type, editingItem));
+  const [formData, setFormData] = useState(() =>
+    getInitialFormData(type, editingItem),
+  );
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(editingItem?.image || editingItem?.image_url || "");
+  const [imagePreview, setImagePreview] = useState(
+    editingItem?.image || editingItem?.image_url || "",
+  );
   const queryClient = useQueryClient();
 
   // Update form data when editingItem or type changes
@@ -568,10 +575,14 @@ export default function AddEditModal({ type, editingItem, onClose }) {
           image: editingItem?.image || "",
           button_text: editingItem?.button_text || "",
           bg_color: editingItem?.bg_color || "",
+          type: editingItem?.type || "normal",
           sort_order: editingItem?.sort_order || 0,
-          is_active: editingItem?.is_active !== undefined ? editingItem?.is_active : true,
+          is_active:
+            editingItem?.is_active !== undefined
+              ? editingItem?.is_active
+              : true,
         };
-      
+
       case "dishes":
         return {
           name: editingItem?.name || "",
@@ -583,9 +594,12 @@ export default function AddEditModal({ type, editingItem, onClose }) {
           rating: editingItem?.rating || 0,
           details: editingItem?.details || "",
           sort_order: editingItem?.sort_order || 0,
-          is_active: editingItem?.is_active !== undefined ? editingItem?.is_active : true,
+          is_active:
+            editingItem?.is_active !== undefined
+              ? editingItem?.is_active
+              : true,
         };
-      
+
       case "offers":
         return {
           title: editingItem?.title || "",
@@ -595,9 +609,12 @@ export default function AddEditModal({ type, editingItem, onClose }) {
           image: editingItem?.image || "",
           details: editingItem?.details || "",
           sort_order: editingItem?.sort_order || 0,
-          is_active: editingItem?.is_active !== undefined ? editingItem?.is_active : true,
+          is_active:
+            editingItem?.is_active !== undefined
+              ? editingItem?.is_active
+              : true,
         };
-      
+
       case "categories":
         return {
           name_ar: editingItem?.name_ar || "",
@@ -605,9 +622,12 @@ export default function AddEditModal({ type, editingItem, onClose }) {
           description: editingItem?.description || "",
           image_url: editingItem?.image_url || "",
           sort_order: editingItem?.sort_order || 0,
-          is_active: editingItem?.is_active !== undefined ? editingItem?.is_active : true,
+          is_active:
+            editingItem?.is_active !== undefined
+              ? editingItem?.is_active
+              : true,
         };
-      
+
       default:
         return {};
     }
@@ -625,7 +645,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
 
   // Create mutations
   const createSlideMutation = useMutation({
-    mutationFn: (data) => adminApi.home.createSlide(data, imageFile),
+    mutationFn: (data) => homeSlidesService.createSlide(data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["home-slides"]);
       toast.success("تم إضافة الشريحة بنجاح!");
@@ -638,7 +658,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
 
   const createDishMutation = useMutation({
     mutationFn: (data) =>
-      adminApi.featuredDishes.createFeaturedDish(data, imageFile),
+      featuredDishesService.createFeaturedDish(data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["featured-dishes"]);
       toast.success("تم إضافة الطبق بنجاح!");
@@ -650,7 +670,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
   });
 
   const createOfferMutation = useMutation({
-    mutationFn: (data) => adminApi.offers.createOffer(data, imageFile),
+    mutationFn: (data) => offersService.createOffer(data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["offers"]);
       toast.success("تم إضافة العرض بنجاح!");
@@ -662,7 +682,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
   });
 
   const createCategoryMutation = useMutation({
-    mutationFn: (data) => adminApi.categories.createCategory(data, imageFile),
+    mutationFn: (data) => categoriesService.createCategory(data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["categories"]);
       toast.success("تم إضافة التصنيف بنجاح!");
@@ -676,7 +696,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
   // Update mutations
   const updateSlideMutation = useMutation({
     mutationFn: ({ id, data }) =>
-      adminApi.home.updateSlide(id, data, imageFile),
+      homeSlidesService.updateSlide(id, data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["home-slides"]);
       toast.success("تم تحديث الشريحة بنجاح!");
@@ -689,7 +709,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
 
   const updateDishMutation = useMutation({
     mutationFn: ({ id, data }) =>
-      adminApi.featuredDishes.updateFeaturedDish(id, data, imageFile),
+      featuredDishesService.updateFeaturedDish(id, data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["featured-dishes"]);
       toast.success("تم تحديث الطبق بنجاح!");
@@ -702,7 +722,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
 
   const updateOfferMutation = useMutation({
     mutationFn: ({ id, data }) =>
-      adminApi.offers.updateOffer(id, data, imageFile),
+      offersService.updateOffer(id, data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["offers"]);
       toast.success("تم تحديث العرض بنجاح!");
@@ -715,7 +735,7 @@ export default function AddEditModal({ type, editingItem, onClose }) {
 
   const updateCategoryMutation = useMutation({
     mutationFn: ({ id, data }) =>
-      adminApi.categories.updateCategory(id, data, imageFile),
+      categoriesService.updateCategory(id, data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries(["categories"]);
       toast.success("تم تحديث التصنيف بنجاح!");
@@ -813,13 +833,13 @@ export default function AddEditModal({ type, editingItem, onClose }) {
   const getModalTitle = () => {
     const action = editingItem ? "تعديل" : "إضافة";
     const itemType =
-      type === "slides" 
-        ? "شريحة" 
-        : type === "dishes" 
-        ? "طبق مميز" 
-        : type === "offers" 
-        ? "عرض" 
-        : "تصنيف";
+      type === "slides"
+        ? "شريحة"
+        : type === "dishes"
+          ? "طبق مميز"
+          : type === "offers"
+            ? "عرض"
+            : "تصنيف";
 
     return `${action} ${itemType}`;
   };
@@ -898,6 +918,26 @@ export default function AddEditModal({ type, editingItem, onClose }) {
               />
               <div className="mt-1 text-sm text-white/60">
                 اللون الحالي: {formData.bg_color || "#C49A6C"}
+              </div>
+            </div>
+            <div>
+              <label className="block text-white font-medium mb-2">
+                نوع الصورة
+              </label>
+              <select
+                value={formData.type || "normal"}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value })
+                }
+                className="w-full bg-zinc-800 border border-[#C49A6C]/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#C49A6C] transition-colors"
+              >
+                <option value="normal">صورة مع نصوص وزر</option>
+                <option value="image-only">صورة فقط (بدون نصوص)</option>
+              </select>
+              <div className="mt-2 text-xs text-white/60">
+                {formData.type === "image-only"
+                  ? "✓ ستظهر الصورة بدون أي نصوص أو أزرار"
+                  : "✓ ستظهر الصورة مع العنوان والوصف والزر"}
               </div>
             </div>
           </>
@@ -1003,7 +1043,10 @@ export default function AddEditModal({ type, editingItem, onClose }) {
                 step="0.1"
                 value={formData.rating}
                 onChange={(e) =>
-                  setFormData({ ...formData, rating: parseFloat(e.target.value) || 0 })
+                  setFormData({
+                    ...formData,
+                    rating: parseFloat(e.target.value) || 0,
+                  })
                 }
                 className="w-full bg-zinc-800 border border-[#C49A6C]/30 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-[#C49A6C] transition-colors"
                 placeholder="مثال: 4.5"
@@ -1170,7 +1213,9 @@ export default function AddEditModal({ type, editingItem, onClose }) {
                   className="w-full bg-zinc-800 border border-[#C49A6C]/30 rounded-lg px-4 py-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#C49A6C] file:text-black hover:file:bg-[#B8895A]"
                 />
                 <p className="mt-2 text-sm text-white/60">
-                  {imageFile ? `تم اختيار: ${imageFile.name}` : "لم يتم اختيار صورة"}
+                  {imageFile
+                    ? `تم اختيار: ${imageFile.name}`
+                    : "لم يتم اختيار صورة"}
                 </p>
               </div>
               {imagePreview && (

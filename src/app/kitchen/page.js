@@ -15,8 +15,10 @@ import {
   Utensils,
   RefreshCw,
 } from "lucide-react";
-import { adminApi } from "../_services/adminApi";
 import { queryKeys, setupRealtime } from "../_services/react-query";
+import { authService } from "../_services/auth.service";
+import { ordersService } from "../_services/orders.service";
+import { supabase } from "../_services/supabase";
 
 export default function KitchenPage() {
   const router = useRouter();
@@ -25,13 +27,13 @@ export default function KitchenPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = await adminApi.auth.checkAuth();
+      const isAuth = await authService.checkAuth();
       if (!isAuth) {
         router.push("/admin/login");
         return;
       }
 
-      const userRole = adminApi.auth.getCurrentRole();
+      const userRole = authService.getCurrentRole();
       if (!["chief", "admin"].includes(userRole)) {
         toast.error("غير مصرح لك بالوصول إلى المطبخ");
         router.push("/");
@@ -44,14 +46,14 @@ export default function KitchenPage() {
   // إعداد Supabase Realtime
   useEffect(() => {
     const cleanup = setupRealtime(
-      adminApi.supabase,
+      supabase,
       (newOrder) => {
         toast.success(`طلب جديد من ${newOrder.customer_name}`);
         queryClient.invalidateQueries({ queryKey: queryKeys.orders.kitchen() });
       },
       (updatedOrder) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.orders.kitchen() });
-      }
+      },
     );
 
     return cleanup;
@@ -65,14 +67,14 @@ export default function KitchenPage() {
     refetch,
   } = useQuery({
     queryKey: queryKeys.orders.kitchen(),
-    queryFn: () => adminApi.orders.getKitchenOrders(),
+    queryFn: () => ordersService.getKitchenOrders(),
     refetchInterval: 15000, // تحديث كل 15 ثانية
   });
 
   // طلب تحديث حالة الطلب
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ orderId, newStatus }) =>
-      adminApi.orders.updateOrderStatus(orderId, newStatus),
+      ordersService.updateOrderStatus(orderId, newStatus),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.kitchen() });
       toast.success("تم تحديث حالة الطلب");
@@ -121,14 +123,14 @@ export default function KitchenPage() {
   const filteredOrders = orders.filter(
     (order) =>
       order.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer_phone?.includes(searchTerm)
+      order.customer_phone?.includes(searchTerm),
   );
 
   const pendingOrders = filteredOrders.filter(
-    (order) => order.status === "pending"
+    (order) => order.status === "pending",
   );
   const preparingOrders = filteredOrders.filter(
-    (order) => order.status === "preparing"
+    (order) => order.status === "preparing",
   );
 
   if (isLoading) {
@@ -226,7 +228,7 @@ export default function KitchenPage() {
                 <p className="text-2xl font-bold text-white">
                   {filteredOrders.reduce(
                     (total, order) => total + getOrderItemsCount(order.items),
-                    0
+                    0,
                   )}
                 </p>
               </div>
