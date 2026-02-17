@@ -41,8 +41,8 @@ const CategoriesSection = ({categories}) => {
                       src={category.image_url}
                       alt={category.name_ar}
                       fill
-                      sizes="true"
-                      property="true"
+                      sizes="64px"
+                      loading="lazy"
                       className="object-cover"
                     />
                   </div>
@@ -71,8 +71,8 @@ const CategoriesSection = ({categories}) => {
                       src={category.image_url}
                       alt={category.name_ar}
                       fill
-                      priority={true} 
-                      sizes="true"  
+                      sizes="64px"
+                      loading="lazy"
                       className="object-cover"
                     />
                   </div>

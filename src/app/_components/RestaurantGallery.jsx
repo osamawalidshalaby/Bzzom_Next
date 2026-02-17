@@ -1,24 +1,45 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { settingsService } from '../_services/settings.service';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import Image from "next/image";
 
 const RestaurantGallery = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [isInView, setIsInView] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    if (!sectionRef.current || isInView) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "250px 0px" },
+    );
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [isInView]);
 
   // Fetch gallery images from database
   const { data: photos = [], isLoading } = useQuery({
     queryKey: ['restaurant-gallery'],
     queryFn: () => settingsService.getGalleryImages(),
+    enabled: isInView,
     staleTime: 1000 * 60 * 10, // 10 minutes
   });
 
   // Show loading state
-  if (isLoading) {
+  if (!isInView || isLoading) {
     return (
-      <section className="py-8 md:py-10 px-4 bg-linear-to-b from-zinc-900 to-black w-full relative">
+      <section ref={sectionRef} className="py-8 md:py-10 px-4 bg-linear-to-b from-zinc-900 to-black w-full relative">
         <div className="max-w-7xl mx-auto w-full">
           <div className="text-center text-white/60">جاري تحميل المعرض...</div>
         </div>
@@ -29,7 +50,7 @@ const RestaurantGallery = () => {
   // Show empty state for customers
   if (photos.length === 0) {
     return (
-      <section className="py-8 md:py-10 px-4 bg-linear-to-b from-zinc-900 to-black w-full relative">
+      <section ref={sectionRef} className="py-8 md:py-10 px-4 bg-linear-to-b from-zinc-900 to-black w-full relative">
         <div className="max-w-7xl mx-auto w-full">
           <h2 className="text-3xl md:text-5xl font-bold text-[#C49A6C] mb-4 text-center">معرض المطعم</h2>
           <p className="text-lg md:text-xl text-white/60 text-center">سيتم إضافة صور المعرض قريباً</p>
@@ -50,7 +71,7 @@ const RestaurantGallery = () => {
     );
   };
   return (
-    <section className="py-8 md:py-10 px-4 bg-linear-to-b from-zinc-900 to-black w-full relative">
+    <section ref={sectionRef} className="py-8 md:py-10 px-4 bg-linear-to-b from-zinc-900 to-black w-full relative">
       <div className="max-w-7xl mx-auto w-full">
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
@@ -82,9 +103,12 @@ const RestaurantGallery = () => {
               transition={{ delay: idx * 0.1 }}
               className="rounded-xl overflow-hidden h-32 md:h-48 lg:h-64 group cursor-pointer w-full relative"
             >
-              <img 
-                src={photo.image_url} 
-                alt={photo.title}
+              <Image
+                src={photo.image_url}
+                alt={photo.title || "Gallery image"}
+                fill
+                loading="lazy"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 33vw"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
               />
               {/* No title overlay as requested */}
@@ -176,3 +200,4 @@ const RestaurantGallery = () => {
 };
 
 export default RestaurantGallery;
+

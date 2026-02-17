@@ -910,7 +910,7 @@ export default function OrderConfirmationPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-black/30 rounded-lg p-4">
               <p className="text-white/60 text-sm mb-1">📞 رقم الهاتف</p>
-              <p className="text-white font-bold">01000000000</p>
+              <p className="text-white font-bold">01007576444</p>
             </div>
             <div className="bg-black/30 rounded-lg p-4">
               <p className="text-white/60 text-sm mb-1">🕒 أوقات العمل</p>

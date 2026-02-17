@@ -932,6 +932,7 @@ import {
 import { useApp } from "../layout-client";
 import { customerApi } from "../_services/customerApi";
 import { paymentService } from "../_services/paymentService";
+import { settingsService } from "../_services/settings.service";
 
 export default function CheckoutPage() {
   const { cart, getTotalPrice, setCart } = useApp();
@@ -939,7 +940,7 @@ export default function CheckoutPage() {
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
-  const [userData, setUserData] = useState(null);
+  const [isPaymobEnabled, setIsPaymobEnabled] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -1006,6 +1007,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     loadUserData();
+    loadPaymentSettings();
     
     // إذا كانت السلة فارغة، توجيه إلى القائمة
     if (cart.length === 0) {
@@ -1028,6 +1030,19 @@ export default function CheckoutPage() {
     }
   }, []);
 
+  const loadPaymentSettings = async () => {
+    try {
+      const settings = await settingsService.getSettings();
+      const paymobEnabled =
+        Boolean(settings?.app?.enableOnlinePayment) &&
+        Boolean(settings?.app?.enablePaymob);
+      setIsPaymobEnabled(paymobEnabled);
+    } catch (error) {
+      console.error("Error loading payment settings:", error);
+      setIsPaymobEnabled(false);
+    }
+  };
+
   const loadUserData = async () => {
     try {
       const isAuth = customerApi.isAuthenticated();
@@ -1041,7 +1056,6 @@ export default function CheckoutPage() {
       // تحميل بيانات المستخدم
       const user = await customerApi.getCurrentCustomer();
       if (user) {
-        setUserData(user);
         setAddresses(user.addresses || []);
         
         // الحصول على البيانات المحفوظة
@@ -1052,7 +1066,10 @@ export default function CheckoutPage() {
         setFormData({
           name: lastOrderInfo.name || user.name || "",
           phone: lastOrderInfo.phone || user.phone || "",
-          paymentMethod: lastOrderInfo.paymentMethod || "cash",
+          paymentMethod:
+            isPaymobEnabled && lastOrderInfo.paymentMethod === "paymob"
+              ? "paymob"
+              : "cash",
           chefNotes: lastOrderInfo.chefNotes || "",
         });
 
@@ -1229,7 +1246,10 @@ export default function CheckoutPage() {
       customerApi.saveLastOrderInfo({
         name: formData.name,
         phone: formData.phone,
-        paymentMethod: formData.paymentMethod,
+        paymentMethod:
+          formData.paymentMethod === "paymob" && isPaymobEnabled
+            ? "paymob"
+            : "cash",
         chefNotes: formData.chefNotes
       });
 
@@ -1250,7 +1270,10 @@ export default function CheckoutPage() {
           image: item.image,
         })),
         total_amount: getTotalPrice(),
-        payment_method: formData.paymentMethod,
+        payment_method:
+          formData.paymentMethod === "paymob" && isPaymobEnabled
+            ? "paymob"
+            : "cash",
         chef_notes: formData.chefNotes,
         customer_id: customerId,
         status: "pending",
@@ -1272,60 +1295,52 @@ export default function CheckoutPage() {
       sendOrderEmail(data.id);
 
       // إذا كانت طريقة الدفع Paymob
-      if (formData.paymentMethod === "paymob") {
+      if (formData.paymentMethod === "paymob" && isPaymobEnabled) {
         try {
           const billingData = {
-            first_name: formData.name.split(' ')[0],
-            last_name: formData.name.split(' ').slice(1).join(' ') || formData.name,
-            email: userData?.email || "",
-            phone_number: formData.phone
+            first_name: formData.name.split(" ")[0],
+            last_name: formData.name.split(" ").slice(1).join(" ") || formData.name,
+            email: "",
+            phone_number: formData.phone,
           };
 
           const returnUrl = `${window.location.origin}/order-confirmation/${data.id}`;
-          // إنشاء دفعة Paymob
           const paymentResult = await paymentService.createPaymobPayment(
             data.id,
             getTotalPrice(),
             billingData,
-            returnUrl 
+            returnUrl,
           );
 
-          // حفظ معرف طلب Paymob
           await supabase
             .from("orders")
-            .update({ 
+            .update({
               paymob_order_id: paymentResult.paymob_order_id,
-              payment_status: 'pending'
+              payment_status: "pending",
             })
-            .eq('id', data.id);
+            .eq("id", data.id);
 
-          // إعادة تعيين السلة
           setCart([]);
-
-          // توجيه إلى Paymob iframe
           paymentService.redirectToPaymobIframe(
             paymentResult.payment_key,
-            paymentResult.iframe_id
+            paymentResult.iframe_id,
           );
-
-          return; // Exit early for Paymob payment
-          
+          return;
         } catch (paymobError) {
           console.error("خطأ في Paymob:", paymobError);
           toast.error("حدث خطأ في بدء عملية الدفع الإلكتروني");
-          
-          // تحديث حالة الطلب إلى فشل
+
           await supabase
             .from("orders")
-            .update({ payment_status: 'failed' })
-            .eq('id', data.id);
-            
+            .update({ payment_status: "failed" })
+            .eq("id", data.id);
+
           setIsLoading(false);
           return;
         }
       }
 
-      // للدفع النقدي أو البطاقة
+      // للدفع النقدي
       toast.success("تم إنشاء الطلب بنجاح! سيتم تجهيزه قريباً");
 
       // إعادة تعيين السلة
@@ -1404,7 +1419,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-black text-white pt-16 pb-12 px-4">
       <Toaster position="top-center" />
       
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto mt-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Link
@@ -1693,26 +1708,46 @@ export default function CheckoutPage() {
 
             <button
               type="button"
-              onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "paymob" }))}
-              className={`p-4 rounded-lg border transition-all ${formData.paymentMethod === "paymob"
-                  ? "border-purple-500 bg-purple-900/20"
-                  : "border-zinc-700 bg-zinc-800 hover:border-purple-500/50"}`}
+              onClick={() =>
+                isPaymobEnabled &&
+                setFormData((prev) => ({ ...prev, paymentMethod: "paymob" }))
+              }
+              disabled={!isPaymobEnabled}
+              className={`p-4 rounded-lg border transition-all ${
+                !isPaymobEnabled
+                  ? "border-zinc-700 bg-zinc-800/50 opacity-60 cursor-not-allowed"
+                  : formData.paymentMethod === "paymob"
+                    ? "border-purple-500 bg-purple-900/20"
+                    : "border-zinc-700 bg-zinc-800 hover:border-purple-500/50"
+              }`}
             >
               <div className="flex flex-col items-center gap-2">
                 <CreditCard className="w-6 h-6 text-purple-400" />
                 <span className="text-white font-medium">بطاقة</span>
-                <span className="text-white/60 text-xs">Paymob</span>
+                <span
+                  className={`text-xs font-semibold ${
+                    isPaymobEnabled ? "text-purple-300" : "text-amber-300"
+                  }`}
+                >
+                  {isPaymobEnabled ? "Paymob" : "Coming Soon"}
+                </span>
               </div>
             </button>
           </div>
           
-          {formData.paymentMethod === "paymob" && (
-            <div className="mt-4 p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-              <p className="text-purple-300 text-sm">
-                💳 سيتم توجيهك لصفحة آمنة لإتمام الدفع عبر بطاقتك الائتمانية
+          {!isPaymobEnabled ? (
+            <div className="mt-4 p-3 bg-amber-900/20 border border-amber-500/30 rounded-lg">
+              <p className="text-amber-300 text-sm">
+                💳 الدفع عبر Visa غير مفعل حاليا .
               </p>
             </div>
-          )}
+          ) : formData.paymentMethod === "paymob" ? (
+            <div className="mt-4 p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
+              <p className="text-purple-300 text-sm">
+                💳 سيتم توجيهك لصفحة آمنة لإتمام الدفع عبر Paymob.
+              </p>
+            </div>
+          ) : null}
         </motion.div>
 
         {/* Chef Notes */}
@@ -1818,16 +1853,17 @@ export default function CheckoutPage() {
             {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                {formData.paymentMethod === "paymob" ? "جاري تحويلك للدفع..." : "جاري إنشاء الطلب..."}
+                {formData.paymentMethod === "paymob" && isPaymobEnabled
+                  ? "جاري تحويلك للدفع..."
+                  : "جاري إنشاء الطلب..."}
               </>
             ) : (
               <>
                 <CheckCircle className="w-5 h-5" />
                 <span>
-                  {formData.paymentMethod === "paymob" 
+                  {formData.paymentMethod === "paymob" && isPaymobEnabled
                     ? `دفع ${getTotalPrice()} ج.م عبر Paymob`
-                    : `تأكيد الطلب ودفع ${getTotalPrice()} ج.م`
-                  }
+                    : `تأكيد الطلب ودفع ${getTotalPrice()} ج.م`}
                 </span>
               </>
             )}

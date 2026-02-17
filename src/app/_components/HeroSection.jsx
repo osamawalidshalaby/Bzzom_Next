@@ -8,24 +8,27 @@ import Link from 'next/link';
 
 const HeroSection = ({ slides, currentSlide, goToSlide }) => {
   const [autoPlay, setAutoPlay] = useState(true);
+  const hasSlides = Array.isArray(slides) && slides.length > 0;
 
   const nextSlide = useCallback(() => {
+    if (!hasSlides) return;
     goToSlide((currentSlide + 1) % slides.length);
-  }, [currentSlide, goToSlide, slides.length]);
+  }, [currentSlide, goToSlide, slides.length, hasSlides]);
 
   const prevSlide = useCallback(() => {
+    if (!hasSlides) return;
     goToSlide((currentSlide - 1 + slides.length) % slides.length);
-  }, [currentSlide, goToSlide, slides.length]);
+  }, [currentSlide, goToSlide, slides.length, hasSlides]);
 
   useEffect(() => {
-    if (!autoPlay) return;
+    if (!autoPlay || !hasSlides) return;
     
     const interval = setInterval(() => {
       nextSlide();
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [autoPlay, nextSlide]);
+  }, [autoPlay, nextSlide, hasSlides]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -58,6 +61,21 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
       }, 800);
     }
   };
+
+  const shouldLoadSlideImage = (index) => {
+    if (slides.length <= 2) return true;
+    const prev = (currentSlide - 1 + slides.length) % slides.length;
+    const next = (currentSlide + 1) % slides.length;
+    return index === currentSlide || index === prev || index === next || index === 0;
+  };
+
+  if (!hasSlides) {
+    return (
+      <section className="relative overflow-hidden">
+        <div className="h-[40vh] min-h-[300px] lg:h-[calc(100vh-4rem)] relative mt-16 bg-zinc-900 animate-pulse" />
+      </section>
+    );
+  }
 
   return (
     <section 
@@ -93,14 +111,19 @@ const HeroSection = ({ slides, currentSlide, goToSlide }) => {
               }}
             >
               <div className="absolute inset-0">
-                <Image 
-                  src={slide.image} 
-                  alt={slide.title}
-                  fill
-                  className="object-cover"
-                  priority={true}
-                  loading='eager'
-                />
+                {shouldLoadSlideImage(index) ? (
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    sizes="100vw"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-zinc-900" />
+                )}
               </div>
             </Link>
             

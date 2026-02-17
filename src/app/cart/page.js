@@ -955,7 +955,7 @@ const Cart = () => {
       />
 
       <div className="min-h-screen bg-black text-white pt-16 pb-12 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto mt-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <Link
@@ -966,7 +966,7 @@ const Cart = () => {
               <span>العودة للقائمة</span>
             </Link>
             <h1 className="text-xl font-bold text-[#C49A6C] text-center">
-              سلة الطلبات
+              
             </h1>
             <div className="w-10"></div>
           </div>

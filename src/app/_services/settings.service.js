@@ -36,6 +36,7 @@ export const settingsService = {
             maintenanceMode: false,
             enableOnlinePayment: true,
             enableCashPayment: true,
+            enablePaymob: false,
             enableDelivery: true,
             enableDineIn: true,
             ramadanBannerEnabled: false,

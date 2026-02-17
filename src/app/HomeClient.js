@@ -1,6 +1,6 @@
 // HomeClient.js
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { CreditCard, Clock } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
@@ -45,14 +45,6 @@ export default function HomeClient({
   // const { featuredDishes, isLoading: isFeaturedDishesLoading } =
   //   useFeaturedDishes();
   // const { offers, isLoading: isOffersLoading } = useOffers();
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [slides.length]);
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -254,8 +246,8 @@ export default function HomeClient({
                   onLocationClick={handleLocationClick}
                 />
               </div>
-
-              {/* Payment Methods */}
+              {/* important */}
+              {/* Payment Methods */} 
               <div className="w-full">
                 <h3 className="text-2xl md:text-3xl font-bold text-[#C49A6C] mb-4 md:mb-6 wrap-break-word">
                   طرق الدفع

@@ -8,7 +8,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { ChefHat, ArrowRight, LogIn, Home } from "lucide-react";
 import { customerApi } from "../../_services/customerApi";
 import { authService } from "../../_services/auth.service";
-import Image from "next/image";
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -75,12 +74,24 @@ export default function SignInPage() {
               </>
             ) : (
               <>
-                <Image
-                  src="https://www.google.com/favicon.ico"
-                  alt="Google"
-                  width={20}
-                  height={20}
-                />
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="#EA4335"
+                    d="M12 10.2v3.9h5.5c-.2 1.2-.9 2.3-1.9 3v2.5h3.1c1.8-1.7 2.9-4.2 2.9-7.1 0-.6-.1-1.2-.2-1.8H12z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 22c2.6 0 4.8-.9 6.4-2.4l-3.1-2.5c-.9.6-2 .9-3.3.9-2.5 0-4.6-1.7-5.4-3.9H3.4v2.6A10 10 0 0012 22z"
+                  />
+                  <path
+                    fill="#4A90E2"
+                    d="M6.6 14.1c-.2-.6-.3-1.4-.3-2.1 0-.7.1-1.4.3-2.1V7.3H3.4A10 10 0 002 12c0 1.7.4 3.3 1.4 4.7l3.2-2.6z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M12 5.9c1.4 0 2.7.5 3.7 1.4l2.8-2.8A10 10 0 0012 2 10 10 0 003.4 7.3l3.2 2.6C7.4 7.6 9.5 5.9 12 5.9z"
+                  />
+                </svg>
                 <span>تسجيل الدخول بحساب جوجل</span>
                 <ArrowRight className="w-4 h-4" />
               </>

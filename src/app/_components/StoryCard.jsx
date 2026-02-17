@@ -21,7 +21,7 @@ function StoryCard() {
             <div className="rounded-2xl w-full md:max-h-[380px] mt-6 lg:m-0 lg:min-w-[500px] xl:min-w-[600px] overflow-hidden">
                 <Image 
                     className="hover:scale-110 transition cursor-pointer w-full" 
-                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" 
+                    src="https://wjonvtrnuspwxabtrqzz.supabase.co/storage/v1/object/public/images/uploads/1770733167540-4s2l5on7zh9.webp" 
                     alt="bazzom"
                     width={600}
                     height={380}

@@ -153,7 +153,7 @@ export default function ClientLayout({ children }) {
   };
 
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" >
       <body className={tajawal.className}>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
