@@ -28,14 +28,14 @@ const OfferCard = ({
       <div className="h-40 md:h-48 overflow-hidden">
         <Image 
           src={offer.image} 
-          alt={offer.title}
+          alt={offer.name}
           width={384}
           height={192}
           className="w-full h-full object-cover"
         />
       </div>
       <div className="p-4">
-        <h3 className="text-xl font-bold text-[#C49A6C] mb-2 wrap-break-word">{offer.title}</h3>
+        <h3 className="text-xl font-bold text-[#C49A6C] mb-2 wrap-break-word">{offer.name}</h3>
         <p className="text-white/70 text-sm mb-4 line-clamp-2">{offer.description}</p>
         <div className="flex items-center gap-3 mb-4">
           <p className="text-xl font-bold text-white">{offer.price} ج م</p>

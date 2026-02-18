@@ -25,7 +25,7 @@ export const authApi = {
   // تسجيل الدخول
   login: async (email, password) => {
     try {
-      console.log("🔐 محاولة تسجيل الدخول...", email);
+      
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -37,7 +37,7 @@ export const authApi = {
         throw error;
       }
 
-      console.log("✅ تسجيل الدخول ناجح للمستخدم:", data.user.email);
+      
 
       // الحصول على بيانات المستخدم من user_profiles
       const userId = data.user.id;
@@ -70,7 +70,7 @@ export const authApi = {
           }
 
           // إنشاء ملف مستخدم جديد إذا كان موظفاً
-          console.log("🆕 إنشاء ملف مستخدم جديد...");
+          
           const newProfile = {
             id: userId,
             email: data.user.email,
@@ -98,11 +98,11 @@ export const authApi = {
 
           userProfile = createdProfile;
           userRole = createdProfile.role;
-          console.log("✅ تم إنشاء ملف مستخدم جديد:", userProfile);
+          
         } else {
           userProfile = profileData;
           userRole = profileData.role;
-          console.log("✅ تم العثور على ملف المستخدم:", userProfile);
+          
         }
       } catch (profileError) {
         console.error("❌ خطأ في معالجة ملف المستخدم:", profileError);
@@ -113,11 +113,6 @@ export const authApi = {
       const roleToStore = userRole || "cashier";
       const nameToStore = userProfile?.name || data.user.email.split("@")[0];
 
-      console.log("💾 تخزين البيانات في localStorage:", {
-        role: roleToStore,
-        name: nameToStore,
-        userId: userId,
-      });
 
       localStorage.setItem("userRole", roleToStore);
       localStorage.setItem("userId", userId);
@@ -128,12 +123,6 @@ export const authApi = {
       // تنظيف بيانات العميل إذا كانت موجودة
       localStorage.removeItem("customerAuthenticated");
       localStorage.removeItem("customerId");
-
-      // تحقق من التخزين
-      console.log("✅ البيانات المخزنة في localStorage:");
-      console.log("- userRole:", localStorage.getItem("userRole"));
-      console.log("- userId:", localStorage.getItem("userId"));
-      console.log("- userName:", localStorage.getItem("userName"));
 
       return {
         user: data.user,
@@ -729,7 +718,7 @@ export const authApi = {
       tests.auth = !authError;
       tests.hasSession = !!authData?.session;
 
-      console.log("نتائج الاختبار:", tests);
+      
 
       return {
         success: true,
@@ -792,26 +781,25 @@ export const ordersApi = {
   getOrders: async (filters = {}) => {
     try {
       const userRole = authApi.getCurrentRole();
-      console.log(`📋 جلب الطلبات للمستخدم بدور: ${userRole}`);
-
+      
       let query = supabase.from("orders").select("*");
 
       // تطبيق الفلاتر بناء على الدور
       if (userRole === "chief") {
         query = query.in("status", ["pending", "preparing"]);
-        console.log("👨‍🍳 الشيف: عرض طلبات المطبخ فقط");
+        
       }
 
       if (filters.status && filters.status !== "all") {
         query = query.eq("status", filters.status);
-        console.log(`🔍 تصفية بالحالة: ${filters.status}`);
+        
       }
 
       if (filters.search) {
         query = query.or(
           `customer_name.ilike.%${filters.search}%,customer_phone.ilike.%${filters.search}%,id.ilike.%${filters.search}%`,
         );
-        console.log(`🔍 بحث عن: ${filters.search}`);
+       
       }
 
       query = query.order("created_at", { ascending: false });
@@ -823,7 +811,7 @@ export const ordersApi = {
         throw error;
       }
 
-      console.log(`✅ تم جلب ${data?.length || 0} طلب`);
+      
       return data || [];
     } catch (error) {
       console.error("Get orders error:", error);
@@ -834,7 +822,7 @@ export const ordersApi = {
   // الحصول على طلب بواسطة ID
   getOrderById: async (id) => {
     try {
-      console.log(`🔍 جلب الطلب: ${id}`);
+      
 
       const { data, error } = await supabase
         .from("orders")
@@ -847,7 +835,7 @@ export const ordersApi = {
         throw error;
       }
 
-      console.log(`✅ تم جلب الطلب: ${id}`);
+     
       return data;
     } catch (error) {
       console.error("Get order by id error:", error);
@@ -861,11 +849,6 @@ export const ordersApi = {
       const cashierId = localStorage.getItem("userId");
       const cashierRole = localStorage.getItem("userRole");
 
-      console.log("🛒 إنشاء طلب جديد:", {
-        cashierId,
-        cashierRole,
-        customer: orderData.customer_name,
-      });
 
       const orderToInsert = {
         customer_name: orderData.customer_name,
@@ -893,7 +876,7 @@ export const ordersApi = {
         throw error;
       }
 
-      console.log(`✅ تم إنشاء الطلب بنجاح: ${data.id}`);
+      
 
       // محاولة إرسال إشعار للشيف
       try {
@@ -906,7 +889,7 @@ export const ordersApi = {
             created_at: new Date().toISOString(),
           },
         ]);
-        console.log("📢 تم إرسال إشعار للشيف");
+        
       } catch (notifError) {
         console.warn("⚠️ لا يمكن إنشاء الإشعار:", notifError);
       }
@@ -952,7 +935,7 @@ export const ordersApi = {
         throw error;
       }
 
-      console.log(`✅ تم تحديث حالة الطلب إلى ${newStatus}`);
+      
 
       // إرسال إشعار للكاشير إذا أصبح الطلب جاهزاً
       if (newStatus === "ready") {
@@ -966,7 +949,7 @@ export const ordersApi = {
               created_at: new Date().toISOString(),
             },
           ]);
-          console.log("📢 تم إرسال إشعار للكاشير");
+          
         } catch (notifError) {
           console.warn("⚠️ لا يمكن إنشاء الإشعار:", notifError);
         }
@@ -982,7 +965,7 @@ export const ordersApi = {
   // الحصول على طلبات المطبخ
   getKitchenOrders: async () => {
     try {
-      console.log("👨‍🍳 جلب طلبات المطبخ...");
+
 
       const { data, error } = await supabase
         .from("orders")
@@ -995,7 +978,7 @@ export const ordersApi = {
         throw error;
       }
 
-      console.log(`✅ تم جلب ${data?.length || 0} طلب للمطبخ`);
+      
       return data || [];
     } catch (error) {
       console.error("Get kitchen orders error:", error);
@@ -1006,7 +989,7 @@ export const ordersApi = {
   // الحصول على إحصائيات الطلبات
   getOrderStats: async (period = "today") => {
     try {
-      console.log(`📊 جلب إحصائيات الطلبات للفترة: ${period}`);
+      
 
       let startDate = new Date();
       if (period === "today") {
@@ -1041,8 +1024,6 @@ export const ordersApi = {
           .reduce((sum, order) => sum + (order.total_amount || 0), 0),
       };
 
-      console.log("📈 الإحصائيات:", stats);
-
       return stats;
     } catch (error) {
       console.error("Get order stats error:", error);
@@ -1054,7 +1035,7 @@ export const ordersApi = {
   deleteOrder: async (orderId) => {
     try {
       const userRole = authApi.getCurrentRole();
-      console.log(`🗑️ حذف الطلب ${orderId.slice(0, 8)} بواسطة ${userRole}`);
+      
 
       const { error } = await supabase
         .from("orders")
@@ -1066,7 +1047,7 @@ export const ordersApi = {
         throw error;
       }
 
-      console.log("✅ تم حذف الطلب بنجاح");
+      
       return true;
     } catch (error) {
       console.error("Delete order error:", error);
@@ -1393,7 +1374,7 @@ export const menuItemsApi = {
 
   getFilteredMenuItems: async (category = "all", search = "", limit = 20) => {
     try {
-      console.log("🔍 Fetching with params:", { category, search, limit });
+      
 
       // Step 1: Get all active categories
       const { data: categories, error: catError } = await supabase
@@ -1402,7 +1383,7 @@ export const menuItemsApi = {
         .eq("is_active", true);
 
       if (catError) throw catError;
-      console.log("📂 Categories loaded:", categories?.length);
+      
 
       // Step 2: Build the base query
       let query = supabase
@@ -1433,7 +1414,7 @@ export const menuItemsApi = {
         query = query.or(
           `name.ilike.${searchTerm},name_en.ilike.${searchTerm},description.ilike.${searchTerm}`,
         );
-        console.log(`🔎 Searching for: "${search}" in ALL categories`);
+        
       }
 
       // Step 5: Add limit ONLY if:
@@ -1797,7 +1778,7 @@ export const supabaseUtils = {
           table: "orders",
         },
         (payload) => {
-          console.log("Order change received:", payload);
+          
 
           if (
             payload.eventType === "INSERT" &&

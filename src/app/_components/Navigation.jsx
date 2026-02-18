@@ -969,7 +969,7 @@ const Navigation = () => {
       { key: 'home', label: 'الرئيسية', icon: HomeIcon, path: '/', show: true },
       { key: 'menu', label: 'القائمة', icon: Utensils, path: '/menu', show: true },
       { key: 'about', label: 'عن المطعم', icon: Users, path: '/about', show: true },
-      { key: 'reviews', label: 'التقييمات', icon: MessageSquare, path: '/reviews', show: true },
+      // { key: 'reviews', label: 'التقييمات', icon: MessageSquare, path: '/reviews', show: true },
     ];
 
     // عناصر خاصة بالموظفين فقط (لا تظهر للعملاء)
