@@ -354,6 +354,49 @@ export default function OrderConfirmationPage() {
     }
   };
 
+  const formatDateOnly = (dateString) => {
+    if (!dateString) return "ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ";
+    try {
+      const date = new Date(`${dateString}T00:00:00`);
+      return date.toLocaleDateString("ar-EG", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatTimeOnly = (timeString) => {
+    if (!timeString) return "غير معروف";
+    try {
+      const date = new Date(`1970-01-01T${timeString}`);
+      return date.toLocaleTimeString("ar-EG", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return timeString;
+    }
+  };
+
+  const getOrderTypeText = (type) => {
+    const types = {
+      delivery: "توصيل للعنوان",
+      pickup: "استلام من الفرع",
+      reservation: "حجز طاولة",
+    };
+    return types[type] || "غير معروف";
+  };
+
+  const resolveOrderType = (currentOrder) => {
+    if (!currentOrder) return "";
+    if (currentOrder.order_type) return currentOrder.order_type;
+    if (currentOrder.customer_address) return "delivery";
+    return "";
+  };
+
   const getPaymentMethodText = (method) => {
     const methods = {
       cash: "💵 نقدي عند الاستلام",
@@ -651,6 +694,39 @@ export default function OrderConfirmationPage() {
             </div>
           </div>
         </div>
+
+        {resolveOrderType(order) && (
+          <div className="bg-zinc-900 rounded-xl border border-[#C49A6C]/20 p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-indigo-500/20 rounded-lg mt-1">
+                <Truck className="w-5 h-5 text-indigo-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-white/60 text-sm mb-1">نوع الطلب</p>
+                <p className="text-white font-bold">
+                  {getOrderTypeText(resolveOrderType(order))}
+                </p>
+                {resolveOrderType(order) === "reservation" && (
+                  <div className="mt-2 text-white/70 text-sm space-y-1">
+                    <div>عدد الأفراد: {order.reservation_people || "—"}</div>
+                    <div>
+                      اليوم:{" "}
+                      {order.reservation_date
+                        ? formatDateOnly(order.reservation_date)
+                        : "—"}
+                    </div>
+                    <div>
+                      الساعة:{" "}
+                      {order.reservation_time
+                        ? formatTimeOnly(order.reservation_time)
+                        : "—"}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Address Section */}
         {order.customer_address && (

@@ -30,3 +30,27 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+.bazzom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 154, 108, 0.7) rgba(24, 24, 27, 0.9);
+}
+
+.bazzom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bazzom-scroll::-webkit-scrollbar-track {
+  background: rgba(24, 24, 27, 0.9);
+  border-radius: 999px;
+}
+
+.bazzom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(196, 154, 108, 0.7);
+  border-radius: 999px;
+  border: 2px solid rgba(24, 24, 27, 0.9);
+}
+
+.bazzom-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(196, 154, 108, 0.9);
+}

@@ -1,4 +1,4 @@
-
+﻿
 // // ملف: app/checkout/page.jsx
 // "use client";
 // import React, { useState, useEffect } from "react";
@@ -920,7 +920,6 @@ import {
   Home,
   Briefcase,
   Star,
-  Edit,
   Save,
   CheckCircle,
   AlertCircle,
@@ -941,6 +940,8 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [isPaymobEnabled, setIsPaymobEnabled] = useState(false);
+  const [isCashEnabled, setIsCashEnabled] = useState(true);
+  const [userData, setUserData] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -950,6 +951,10 @@ export default function CheckoutPage() {
     phone: "",
     paymentMethod: "cash",
     chefNotes: "",
+    orderType: "delivery",
+    reservationPeople: "",
+    reservationDate: "",
+    reservationTime: "",
   });
   
   const [newAddress, setNewAddress] = useState({
@@ -957,6 +962,11 @@ export default function CheckoutPage() {
     details: "",
     type: "home"
   });
+
+  const isDelivery = formData.orderType === "delivery";
+  const isPickup = formData.orderType === "pickup";
+  const isReservation = formData.orderType === "reservation";
+  const todayDate = new Date().toISOString().split("T")[0];
 
   // دالة لإرسال إيميل الطلب
   const sendOrderEmail = async (orderId) => {
@@ -1006,8 +1016,8 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
-    loadUserData();
     loadPaymentSettings();
+    loadUserData();
     
     // إذا كانت السلة فارغة، توجيه إلى القائمة
     if (cart.length === 0) {
@@ -1033,13 +1043,26 @@ export default function CheckoutPage() {
   const loadPaymentSettings = async () => {
     try {
       const settings = await settingsService.getSettings();
-      const paymobEnabled =
-        Boolean(settings?.app?.enableOnlinePayment) &&
-        Boolean(settings?.app?.enablePaymob);
-      setIsPaymobEnabled(paymobEnabled);
+      const appSettings = settings?.app || {};
+      const allowOnline = appSettings.enableOnlinePayment !== false;
+      const allowCash = appSettings.enableCashPayment !== false;
+      const allowPaymob = allowOnline && appSettings.enablePaymob === true;
+
+      setIsCashEnabled(allowCash);
+      setIsPaymobEnabled(allowPaymob);
+
+      setFormData((prev) => {
+        let nextMethod = prev.paymentMethod;
+        if (nextMethod === "paymob" && !allowPaymob) {
+          nextMethod = allowCash ? "cash" : nextMethod;
+        }
+        if (!allowCash && allowPaymob) {
+          nextMethod = "paymob";
+        }
+        return { ...prev, paymentMethod: nextMethod };
+      });
     } catch (error) {
-      console.error("Error loading payment settings:", error);
-      setIsPaymobEnabled(false);
+      console.error("Load settings error:", error);
     }
   };
 
@@ -1056,6 +1079,7 @@ export default function CheckoutPage() {
       // تحميل بيانات المستخدم
       const user = await customerApi.getCurrentCustomer();
       if (user) {
+        setUserData(user);
         setAddresses(user.addresses || []);
         
         // الحصول على البيانات المحفوظة
@@ -1066,11 +1090,12 @@ export default function CheckoutPage() {
         setFormData({
           name: lastOrderInfo.name || user.name || "",
           phone: lastOrderInfo.phone || user.phone || "",
-          paymentMethod:
-            isPaymobEnabled && lastOrderInfo.paymentMethod === "paymob"
-              ? "paymob"
-              : "cash",
+          paymentMethod: lastOrderInfo.paymentMethod || "cash",
           chefNotes: lastOrderInfo.chefNotes || "",
+          orderType: lastOrderInfo.orderType || "delivery",
+          reservationPeople: "",
+          reservationDate: "",
+          reservationTime: "",
         });
 
         if (defaultAddress) {
@@ -1110,6 +1135,19 @@ export default function CheckoutPage() {
   const handleAddressSelect = (address) => {
     setSelectedAddress(address.id);
     setShowAddressForm(false);
+  };
+
+  const handleOrderTypeSelect = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      orderType: value,
+      reservationPeople: value === "reservation" ? prev.reservationPeople : "",
+      reservationDate: value === "reservation" ? prev.reservationDate : "",
+      reservationTime: value === "reservation" ? prev.reservationTime : "",
+    }));
+    if (value !== "delivery") {
+      setShowAddressForm(false);
+    }
   };
 
   const saveNewAddress = async () => {
@@ -1212,31 +1250,56 @@ export default function CheckoutPage() {
       return;
     }
 
-    // الحصول على العنوان المختار
-    const selected = addresses.find(addr => addr.id === selectedAddress);
-    if (!selected && !showAddressForm) {
-      toast.error("الرجاء اختيار عنوان التوصيل");
+    if (formData.paymentMethod === "paymob" && !isPaymobEnabled) {
+      toast.error("الدفع الإلكتروني غير متاح حالياً");
+      return;
+    }
+    if (formData.paymentMethod === "cash" && !isCashEnabled) {
+      toast.error("الدفع النقدي غير متاح حالياً");
       return;
     }
 
-    // إذا كان هناك عنوان جديد، احفظه أولاً
-    let deliveryAddress = "";
-    if (showAddressForm && newAddress.details.trim()) {
-      const savedAddress = await saveNewAddress();
-      if (savedAddress) {
-        deliveryAddress = savedAddress.address;
-      } else {
+    if (isReservation) {
+      const people = parseInt(formData.reservationPeople, 10);
+      if (!people || people < 1) {
+        toast.error("يرجى إدخال عدد أفراد صحيح");
         return;
       }
-    } else if (selected) {
-      deliveryAddress = selected.address;
+      if (!formData.reservationDate) {
+        toast.error("يرجى اختيار يوم الحجز");
+        return;
+      }
+      if (!formData.reservationTime) {
+        toast.error("يرجى اختيار ساعة الحجز");
+        return;
+      }
     }
 
-    if (!deliveryAddress.trim()) {
-      toast.error("الرجاء إدخال العنوان");
+    // الحصول على العنوان المختار (فقط للتوصيل)
+    const selected = addresses.find(addr => addr.id === selectedAddress);
+    if (isDelivery && !selected && !showAddressForm) {
+      toast.error("يرجى اختيار عنوان التوصيل");
       return;
     }
+    // إذا كان هناك عنوان جديد، احفظه أولاً (للتوصيل فقط)
+    let deliveryAddress = "";
+    if (isDelivery) {
+      if (showAddressForm && newAddress.details.trim()) {
+        const savedAddress = await saveNewAddress();
+        if (savedAddress) {
+          deliveryAddress = savedAddress.address;
+        } else {
+          return;
+        }
+      } else if (selected) {
+        deliveryAddress = selected.address;
+      }
 
+      if (!deliveryAddress.trim()) {
+        toast.error("يرجى إدخال العنوان");
+        return;
+      }
+    }
     setIsLoading(true);
 
     try {
@@ -1246,11 +1309,9 @@ export default function CheckoutPage() {
       customerApi.saveLastOrderInfo({
         name: formData.name,
         phone: formData.phone,
-        paymentMethod:
-          formData.paymentMethod === "paymob" && isPaymobEnabled
-            ? "paymob"
-            : "cash",
-        chefNotes: formData.chefNotes
+        paymentMethod: formData.paymentMethod,
+        chefNotes: formData.chefNotes,
+        orderType: formData.orderType
       });
 
       const customerId = customerApi.getCustomerId();
@@ -1259,7 +1320,11 @@ export default function CheckoutPage() {
       const orderData = {
         customer_name: formData.name,
         customer_phone: formData.phone,
-        customer_address: deliveryAddress,
+        customer_address: isDelivery ? deliveryAddress : null,
+        order_type: formData.orderType,
+        reservation_people: isReservation ? parseInt(formData.reservationPeople, 10) : null,
+        reservation_date: isReservation ? formData.reservationDate : null,
+        reservation_time: isReservation ? formData.reservationTime : null,
         notes: formData.chefNotes,
         items: cart.map(item => ({
           id: item.id,
@@ -1270,10 +1335,7 @@ export default function CheckoutPage() {
           image: item.image,
         })),
         total_amount: getTotalPrice(),
-        payment_method:
-          formData.paymentMethod === "paymob" && isPaymobEnabled
-            ? "paymob"
-            : "cash",
+        payment_method: formData.paymentMethod,
         chef_notes: formData.chefNotes,
         customer_id: customerId,
         status: "pending",
@@ -1295,52 +1357,60 @@ export default function CheckoutPage() {
       sendOrderEmail(data.id);
 
       // إذا كانت طريقة الدفع Paymob
-      if (formData.paymentMethod === "paymob" && isPaymobEnabled) {
+      if (formData.paymentMethod === "paymob") {
         try {
           const billingData = {
-            first_name: formData.name.split(" ")[0],
-            last_name: formData.name.split(" ").slice(1).join(" ") || formData.name,
-            email: "",
-            phone_number: formData.phone,
+            first_name: formData.name.split(' ')[0],
+            last_name: formData.name.split(' ').slice(1).join(' ') || formData.name,
+            email: userData?.email || "",
+            phone_number: formData.phone
           };
 
           const returnUrl = `${window.location.origin}/order-confirmation/${data.id}`;
+          // إنشاء دفعة Paymob
           const paymentResult = await paymentService.createPaymobPayment(
             data.id,
             getTotalPrice(),
             billingData,
-            returnUrl,
+            returnUrl 
           );
 
+          // حفظ معرف طلب Paymob
           await supabase
             .from("orders")
-            .update({
+            .update({ 
               paymob_order_id: paymentResult.paymob_order_id,
-              payment_status: "pending",
+              payment_status: 'pending'
             })
-            .eq("id", data.id);
+            .eq('id', data.id);
 
+          // إعادة تعيين السلة
           setCart([]);
+
+          // توجيه إلى Paymob iframe
           paymentService.redirectToPaymobIframe(
             paymentResult.payment_key,
-            paymentResult.iframe_id,
+            paymentResult.iframe_id
           );
-          return;
+
+          return; // Exit early for Paymob payment
+          
         } catch (paymobError) {
           console.error("خطأ في Paymob:", paymobError);
           toast.error("حدث خطأ في بدء عملية الدفع الإلكتروني");
-
+          
+          // تحديث حالة الطلب إلى فشل
           await supabase
             .from("orders")
-            .update({ payment_status: "failed" })
-            .eq("id", data.id);
-
+            .update({ payment_status: 'failed' })
+            .eq('id', data.id);
+            
           setIsLoading(false);
           return;
         }
       }
 
-      // للدفع النقدي
+      // للدفع النقدي أو البطاقة
       toast.success("تم إنشاء الطلب بنجاح! سيتم تجهيزه قريباً");
 
       // إعادة تعيين السلة
@@ -1373,11 +1443,13 @@ export default function CheckoutPage() {
 
   const calculateEstimatedTime = () => {
     if (cart.length === 0) return "";
+    if (isReservation) return "";
 
     let totalTime = 0;
     cart.forEach(item => {
       let itemTime = 15;
-      if (item.category === "grill" || item.name.includes("شواية")) {
+      const nameIsString = typeof item.name === "string";
+      if (item.category === "grill" || (nameIsString && item.name.includes("شواية"))) {
         itemTime = 25;
       }
       if (item.quantity > 2) {
@@ -1386,7 +1458,11 @@ export default function CheckoutPage() {
       totalTime += itemTime;
     });
 
-    totalTime += 30;
+    if (isDelivery) {
+      totalTime += 30;
+    } else if (isPickup) {
+      totalTime += 10;
+    }
     const now = new Date();
     const deliveryTime = new Date(now.getTime() + totalTime * 60000);
 
@@ -1397,6 +1473,15 @@ export default function CheckoutPage() {
   };
 
   const estimatedTime = calculateEstimatedTime();
+  const addressMissing =
+    isDelivery &&
+    ((showAddressForm && !newAddress.details.trim()) ||
+      (!showAddressForm && !selectedAddress));
+  const reservationMissing =
+    isReservation &&
+    (!formData.reservationPeople ||
+      !formData.reservationDate ||
+      !formData.reservationTime);
 
   if (cart.length === 0) {
     return (
@@ -1419,7 +1504,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-black text-white pt-16 pb-12 px-4">
       <Toaster position="top-center" />
       
-      <div className="max-w-2xl mx-auto mt-6">
+      <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Link
@@ -1491,13 +1576,65 @@ export default function CheckoutPage() {
           </div>
         </motion.div>
 
-        {/* Address Section */}
+        {/* Order Type */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.08 }}
           className="bg-zinc-900 rounded-xl border border-[#C49A6C]/20 p-4 mb-4"
         >
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <Package className="w-5 h-5 text-[#C49A6C]" />
+            نوع الطلب
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => handleOrderTypeSelect("delivery")}
+              className={`p-3 rounded-lg border transition-all ${
+                isDelivery
+                  ? "border-[#C49A6C] bg-[#C49A6C]/10"
+                  : "border-zinc-700 bg-zinc-800 hover:border-[#C49A6C]/50"
+              }`}
+            >
+              <MapPin className="w-5 h-5 text-[#C49A6C] mx-auto mb-2" />
+              <div className="text-sm font-semibold text-white">توصيل</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOrderTypeSelect("pickup")}
+              className={`p-3 rounded-lg border transition-all ${
+                isPickup
+                  ? "border-[#C49A6C] bg-[#C49A6C]/10"
+                  : "border-zinc-700 bg-zinc-800 hover:border-[#C49A6C]/50"
+              }`}
+            >
+              <CheckCircle className="w-5 h-5 text-[#C49A6C] mx-auto mb-2" />
+              <div className="text-sm font-semibold text-white">استلام من الفرع</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOrderTypeSelect("reservation")}
+              className={`p-3 rounded-lg border transition-all ${
+                isReservation
+                  ? "border-[#C49A6C] bg-[#C49A6C]/10"
+                  : "border-zinc-700 bg-zinc-800 hover:border-[#C49A6C]/50"
+              }`}
+            >
+              <Star className="w-5 h-5 text-[#C49A6C] mx-auto mb-2" />
+              <div className="text-sm font-semibold text-white">حجز طاولة</div>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Address Section */}
+        {isDelivery && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-zinc-900 rounded-xl border border-[#C49A6C]/20 p-4 mb-4"
+          >
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <MapPin className="w-5 h-5 text-[#C49A6C]" />
@@ -1677,7 +1814,56 @@ export default function CheckoutPage() {
               </div>
             </div>
           )}
-        </motion.div>
+          </motion.div>
+        )}
+
+        {isReservation && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+            className="bg-zinc-900 rounded-xl border border-[#C49A6C]/20 p-4 mb-4"
+          >
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#C49A6C]" />
+              بيانات الحجز
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-white/70 mb-1 text-sm">عدد الأفراد *</label>
+                <input
+                  type="number"
+                  min="1"
+                  name="reservationPeople"
+                  value={formData.reservationPeople}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-zinc-800 border border-[#C49A6C]/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#C49A6C] transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-white/70 mb-1 text-sm">اليوم *</label>
+                <input
+                  type="date"
+                  min={todayDate}
+                  name="reservationDate"
+                  value={formData.reservationDate}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-zinc-800 border border-[#C49A6C]/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#C49A6C] transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-white/70 mb-1 text-sm">الساعة *</label>
+                <input
+                  type="time"
+                  name="reservationTime"
+                  value={formData.reservationTime}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-zinc-800 border border-[#C49A6C]/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#C49A6C] transition-all text-sm"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Payment Method */}
         <motion.div
@@ -1695,9 +1881,14 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "cash" }))}
-              className={`p-4 rounded-lg border transition-all ${formData.paymentMethod === "cash"
-                  ? "border-green-500 bg-green-900/20"
-                  : "border-zinc-700 bg-zinc-800 hover:border-green-500/50"}`}
+              disabled={!isCashEnabled}
+              className={`p-4 rounded-lg border transition-all ${
+                !isCashEnabled
+                  ? "border-zinc-700 bg-zinc-800/50 opacity-60 cursor-not-allowed"
+                  : formData.paymentMethod === "cash"
+                    ? "border-green-500 bg-green-900/20"
+                    : "border-zinc-700 bg-zinc-800 hover:border-green-500/50"
+              }`}
             >
               <div className="flex flex-col items-center gap-2">
                 <span className="text-2xl">💵</span>
@@ -1708,10 +1899,7 @@ export default function CheckoutPage() {
 
             <button
               type="button"
-              onClick={() =>
-                isPaymobEnabled &&
-                setFormData((prev) => ({ ...prev, paymentMethod: "paymob" }))
-              }
+              onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "paymob" }))}
               disabled={!isPaymobEnabled}
               className={`p-4 rounded-lg border transition-all ${
                 !isPaymobEnabled
@@ -1724,30 +1912,24 @@ export default function CheckoutPage() {
               <div className="flex flex-col items-center gap-2">
                 <CreditCard className="w-6 h-6 text-purple-400" />
                 <span className="text-white font-medium">بطاقة</span>
-                <span
-                  className={`text-xs font-semibold ${
-                    isPaymobEnabled ? "text-purple-300" : "text-amber-300"
-                  }`}
-                >
-                  {isPaymobEnabled ? "Paymob" : "Coming Soon"}
-                </span>
+                <span className="text-white/60 text-xs">Paymob</span>
               </div>
             </button>
           </div>
           
-          {!isPaymobEnabled ? (
-            <div className="mt-4 p-3 bg-amber-900/20 border border-amber-500/30 rounded-lg">
-              <p className="text-amber-300 text-sm">
-                💳 الدفع عبر Visa غير مفعل حاليا .
-              </p>
-            </div>
-          ) : formData.paymentMethod === "paymob" ? (
+          {formData.paymentMethod === "paymob" && isPaymobEnabled && (
             <div className="mt-4 p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
               <p className="text-purple-300 text-sm">
-                💳 سيتم توجيهك لصفحة آمنة لإتمام الدفع عبر Paymob.
+                💳 سيتم توجيهك لصفحة آمنة لإتمام الدفع عبر بطاقتك الائتمانية
               </p>
             </div>
-          ) : null}
+          )}
+          {!isPaymobEnabled && (
+            <div className="mt-3 text-xs text-white/50 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              الدفع الإلكتروني غير متاح حالياً.
+            </div>
+          )}
         </motion.div>
 
         {/* Chef Notes */}
@@ -1806,10 +1988,20 @@ export default function CheckoutPage() {
                 </span>
               </div>
               
-              {estimatedTime && (
+              {(isDelivery || isPickup) && estimatedTime && (
                 <div className="flex items-center gap-2 text-blue-300 text-sm">
                   <Clock className="w-4 h-4" />
-                  <span>وقت التوصيل المتوقع: {estimatedTime}</span>
+                  <span>
+                    {isPickup ? "وقت الاستلام المتوقع" : "وقت التوصيل المتوقع"}: {estimatedTime}
+                  </span>
+                </div>
+              )}
+              {isReservation && formData.reservationDate && formData.reservationTime && (
+                <div className="flex items-center gap-2 text-green-300 text-sm mt-2">
+                  <Clock className="w-4 h-4" />
+                  <span>
+                    موعد الحجز: {formData.reservationDate} - {formData.reservationTime}
+                  </span>
                 </div>
               )}
             </div>
@@ -1817,26 +2009,28 @@ export default function CheckoutPage() {
         </motion.div>
 
         {/* Info Box */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg mb-4"
-        >
-          <div className="flex items-start gap-2">
-            <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-blue-300 text-sm font-medium mb-1">💡 معلومات هامة</p>
-              <ul className="text-blue-200/80 text-xs space-y-1">
-                <li>• أول عنوان تضيفه سيتم تعيينه كافتراضي تلقائياً</li>
-                <li>• يمكنك تغيير العنوان الافتراضي بالنقر على نجمة ⭐</li>
-                <li>• سيتم حفظ بياناتك للطلبات القادمة</li>
-                <li>• يمكنك إدارة عناوينك من صفحة حسابي</li>
-                <li>• سيتم إرسال إيميل تأكيد للطلب تلقائياً</li>
-              </ul>
+        {isDelivery && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg mb-4"
+          >
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-blue-300 text-sm font-medium mb-1">💡 معلومات هامة</p>
+                <ul className="text-blue-200/80 text-xs space-y-1">
+                  <li>• أول عنوان تضيفه سيتم تعيينه كافتراضي تلقائياً</li>
+                  <li>• يمكنك تغيير العنوان الافتراضي بالنقر على نجمة ⭐</li>
+                  <li>• سيتم حفظ بياناتك للطلبات القادمة</li>
+                  <li>• يمكنك إدارة عناوينك من صفحة حسابي</li>
+                  <li>• سيتم إرسال إيميل تأكيد للطلب تلقائياً</li>
+                </ul>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* Action Buttons */}
         <motion.div
@@ -1847,23 +2041,28 @@ export default function CheckoutPage() {
         >
           <button
             onClick={createOrder}
-            disabled={isLoading || !formData.name || !formData.phone || (!selectedAddress && !showAddressForm)}
+            disabled={
+              isLoading ||
+              !formData.name ||
+              !formData.phone ||
+              addressMissing ||
+              reservationMissing
+            }
             className="w-full bg-[#C49A6C] text-black py-4 rounded-xl font-bold text-lg hover:bg-[#B08A5C] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                {formData.paymentMethod === "paymob" && isPaymobEnabled
-                  ? "جاري تحويلك للدفع..."
-                  : "جاري إنشاء الطلب..."}
+                {formData.paymentMethod === "paymob" ? "جاري تحويلك للدفع..." : "جاري إنشاء الطلب..."}
               </>
             ) : (
               <>
                 <CheckCircle className="w-5 h-5" />
                 <span>
-                  {formData.paymentMethod === "paymob" && isPaymobEnabled
+                  {formData.paymentMethod === "paymob" 
                     ? `دفع ${getTotalPrice()} ج.م عبر Paymob`
-                    : `تأكيد الطلب ودفع ${getTotalPrice()} ج.م`}
+                    : `تأكيد الطلب ودفع ${getTotalPrice()} ج.م`
+                  }
                 </span>
               </>
             )}

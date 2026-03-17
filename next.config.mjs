@@ -1,9 +1,7 @@
-
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    formats: ["image/webp", "image/avif"], // دعم الصور الحديثة
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -17,6 +15,10 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
       // إذا كنت تريد السماح لجميع subdomains لـ Supabase:
       {
         protocol: "https",
@@ -24,11 +26,6 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    optimizeCss: true,
-  },
-  compress: true,
-
 };
 
-export default nextConfig
+export default nextConfig;

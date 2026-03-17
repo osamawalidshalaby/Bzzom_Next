@@ -375,6 +375,13 @@ export default function AdminDashboard() {
           color: "bg-orange-500/20 text-orange-400",
         },
         {
+          title: "إدارة العملاء",
+          description: "عرض العملاء وطلبات كل عميل",
+          icon: Users,
+          href: "/admin/customers",
+          color: "bg-cyan-500/20 text-cyan-400",
+        },
+        {
           title: "الإحصائيات",
           description: "عرض إحصائيات الموقع والمبيعات",
           icon: BarChart3,
