@@ -102,19 +102,28 @@ export default function HomeClient({
   };
 
   const handleAddOfferToCart = (offer) => {
+    const offerName = offer?.title || offer?.name || "";
     addToCart({
       id: `offer-${offer.id}`,
-      name: offer.title,
+      name: offerName,
       price: offer.price,
       image: offer.image,
       quantity: 1,
     });
 
-    showToast(`تم إضافة ${offer.title} إلى السلة! 🛒`);
+    showToast(`تم إضافة ${offerName} إلى السلة! 🛒`);
     playAddToCartSound();
   };
 
   const openItemDetails = (item, type) => {
+    if (type === "offer") {
+      setSelectedItem({
+        ...item,
+        name: item?.name || item?.title || "",
+        type,
+      });
+      return;
+    }
     setSelectedItem({ ...item, type });
   };
 
@@ -123,8 +132,12 @@ export default function HomeClient({
   };
 
   const handleModalAddToCart = (itemWithQuantity) => {
-    addToCart(itemWithQuantity);
-    showToast(`تم إضافة ${itemWithQuantity.name} إلى السلة! 🛒`);
+    const normalizedItem = {
+      ...itemWithQuantity,
+      name: itemWithQuantity?.name || itemWithQuantity?.title || "",
+    };
+    addToCart(normalizedItem);
+    showToast(`تم إضافة ${normalizedItem.name} إلى السلة! 🛒`);
   };
 
   return (

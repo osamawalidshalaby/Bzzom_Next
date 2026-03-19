@@ -136,7 +136,7 @@
 //         <div className="relative h-50 overflow-hidden">
 //           <Image 
 //             src={item.image || "/placeholder-image.jpg"} 
-//             alt={item.name || "Bazzom"}
+//             alt={itemName || "Bazzom"}
 //             width={400}
 //             height={256}
 //             className="w-full h-full object-cover"
@@ -157,7 +157,7 @@
 //         <div className="p-6">
 //           <div className="flex justify-between items-start mb-4">
 //             <div>
-//               <h1 className="text-2xl font-bold text-white mb-1">{item.name}</h1>
+//               <h1 className="text-2xl font-bold text-white mb-1">{itemName}</h1>
 //               {item.name_en && item.name_en.trim() !== "" && (
 //                 <p className="text-white/60">{item.name_en}</p>
 //               )}
@@ -252,6 +252,7 @@ const ItemModal = ({
   category = ""
 }) => {
   const [quantity, setQuantity] = useState(1);
+  const itemName = item?.name || item?.title || "";
 
   // حساب السعر باستخدام useMemo
   const price = useMemo(() => {
@@ -292,6 +293,7 @@ const ItemModal = ({
 
     const itemToAdd = {
       ...item,
+      name: itemName,
       quantity: quantity,
       displayQuantity: `${quantity}`,
       calculatedPrice: finalCalculatedPrice,
@@ -331,7 +333,7 @@ const ItemModal = ({
         <div className="relative h-50 overflow-hidden">
           <Image 
             src={item.image || "/placeholder-image.jpg"} 
-            alt={item.name || "Bazzom"}
+            alt={itemName || "Bazzom"}
             width={400}
             height={256}
             className="w-full h-full object-cover"
@@ -352,7 +354,7 @@ const ItemModal = ({
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-white mb-1">{item.name}</h1>
+              <h1 className="text-2xl font-bold text-white mb-1">{itemName}</h1>
               {item.name_en && item.name_en.trim() !== "" && (
                 <p className="text-white/60">{item.name_en}</p>
               )}
