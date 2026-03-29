@@ -8,6 +8,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Tajawal } from "next/font/google";
 import "./globals.css";
 import { usePathname } from "next/navigation";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const tajawal = Tajawal({
   subsets: ["latin"],
@@ -213,6 +214,7 @@ export default function ClientLayout({ children }) {
             </div>
           </AppContext.Provider>
         </QueryClientProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
